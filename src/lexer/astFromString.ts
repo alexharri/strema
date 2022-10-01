@@ -55,6 +55,10 @@ class State {
     return this.s.substr(this.index, 1);
   }
 
+  atDelimeter(delimeter: string) {
+    return this._tokenType === TokenType.Delimeter && this._token === delimeter;
+  }
+
   nextToken() {
     this._tokenType = TokenType.None;
     this._token = "";
@@ -165,9 +169,9 @@ function parseProperties(state: State): PropertyNode[] {
 
     state.nextToken();
 
-    if (state.tokenType() === TokenType.Delimeter && state.token() === "[") {
+    if (state.atDelimeter("[")) {
       state.nextToken();
-      if (state.tokenType() !== TokenType.Delimeter || state.token() !== "]") {
+      if (!state.atDelimeter("]")) {
         throw new Error(`Expected ']'`);
       }
       properties.push({
@@ -182,15 +186,13 @@ function parseProperties(state: State): PropertyNode[] {
 
     /** @todo check for rules */
 
-    const atPropertySeparator =
-      state.tokenType() === TokenType.Delimeter && state.token() === ";";
+    const atPropertySeparator = state.atDelimeter(";");
     if (atPropertySeparator) {
       // We can just jump over property separators
       state.nextToken();
     }
 
-    const atObjectClose =
-      state.tokenType() === TokenType.Delimeter && state.token() === "}";
+    const atObjectClose = state.atDelimeter("}");
     if (atObjectClose) {
       expectMoreProperties = false;
     }
