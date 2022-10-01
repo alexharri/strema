@@ -124,10 +124,10 @@ function parseKey(state: State): string {
 }
 
 function parseProperties(state: State): PropertyNode[] {
-  let findMore = true;
+  let expectMoreProperties = true;
   const properties: PropertyNode[] = [];
 
-  while (findMore) {
+  while (expectMoreProperties) {
     const key = parseKey(state);
 
     state.nextToken();
@@ -166,10 +166,6 @@ function parseProperties(state: State): PropertyNode[] {
     state.nextToken();
 
     if (state.tokenType() === TokenType.Delimeter && state.token() === "[") {
-      // Likely array modifier, for example:
-      //
-      //    a: string[]
-      //
       state.nextToken();
       if (state.tokenType() !== TokenType.Delimeter || state.token() !== "]") {
         throw new Error(`Expected ']'`);
@@ -186,13 +182,17 @@ function parseProperties(state: State): PropertyNode[] {
 
     /** @todo check for rules */
 
-    // Skip over ';'
-    if (state.tokenType() === TokenType.Delimeter && state.token() === ";") {
+    const atPropertySeparator =
+      state.tokenType() === TokenType.Delimeter && state.token() === ";";
+    if (atPropertySeparator) {
+      // We can just jump over property separators
       state.nextToken();
     }
 
-    if (state.tokenType() === TokenType.Delimeter && state.token() === "}") {
-      findMore = false;
+    const atObjectClose =
+      state.tokenType() === TokenType.Delimeter && state.token() === "}";
+    if (atObjectClose) {
+      expectMoreProperties = false;
     }
   }
 
