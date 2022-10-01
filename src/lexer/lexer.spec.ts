@@ -119,4 +119,33 @@ describe("createAst", () => {
 
     expect(ast).toEqual(expectedAst);
   });
+
+  it("throws on an empty template", () => {
+    const run0 = () => createAst("");
+    const run1 = () => createAst("\n\n");
+    const run2 = () => createAst("\n \t");
+
+    for (const run of [run0, run1, run2]) {
+      expect(run).toThrow(`Expected '{'`);
+    }
+  });
+
+  it("throws if a closing brace is not provided for an object", () => {
+    const run0 = () => createAst("{");
+    const run1 = () => createAst("{a:string");
+    const run2 = () => createAst("{a:string;b:number");
+    const run3 = () => createAst("{a:string;b:{c:string};");
+
+    for (const run of [run0, run1, run2, run3]) {
+      expect(run).toThrow(`Unexpected end of template`);
+    }
+  });
+
+  it("throws if a value is not provided for a property", () => {
+    const unexpectedSemicolon = () => createAst("{a:;}");
+    const unexpectedClosingBrace = () => createAst("{a:}");
+
+    expect(unexpectedSemicolon).toThrow(`Unexpected token ';'`);
+    expect(unexpectedClosingBrace).toThrow(`Unexpected token '}'`);
+  });
 });

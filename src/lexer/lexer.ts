@@ -91,6 +91,9 @@ class State {
 }
 
 function parseKey(state: State): string {
+  if (state.tokenType() === TokenType.None) {
+    throw new Error(`Unexpected end of template`);
+  }
   if (state.tokenType() !== TokenType.Symbol) {
     throw new Error(`Unexpected token '${state.token()}'`);
   }
@@ -160,7 +163,7 @@ function parseProperties(state: State): PropertyNode[] {
 
 function parseObject(state: State): ObjectNode {
   if (state.tokenType() !== TokenType.Delimeter || state.token() !== "{") {
-    throw new Error(`Expected {`);
+    throw new Error(`Expected '{'`);
   }
 
   state.nextToken();
