@@ -1,14 +1,15 @@
 import { Ast, ObjectNode, PropertyNode, ValueNode } from "../types/Ast";
 
-const delimeters = new Set([":", ";", "{", "}", "[", "]", "<", ">"]);
-const ignorable = new Set([" ", "\t", "\n"]);
-const primitiveSymbols = ["string", "number"] as const;
-const primitiveSymbolSet = new Set(primitiveSymbols);
+const primitiveList = ["string", "number"] as const;
 
-type PrimitiveSymbol = typeof primitiveSymbols[number];
+const delimeters = new Set([":", ";", "{", "}", "[", "]", "<", ">"]);
+const whitespace = new Set([" ", "\t", "\n"]);
+const primitives = new Set(primitiveList);
+
+type PrimitiveSymbol = typeof primitiveList[number];
 
 function isPrimitiveSymbol(s: string): s is PrimitiveSymbol {
-  return primitiveSymbolSet.has(s as PrimitiveSymbol);
+  return primitives.has(s as PrimitiveSymbol);
 }
 
 function isAlpha(c: string) {
@@ -76,7 +77,7 @@ class State {
 
   private canIgnoreCurrentCharacter() {
     const c = this.currentCharacter();
-    return ignorable.has(c);
+    return whitespace.has(c);
   }
 
   private isAtEnd() {
