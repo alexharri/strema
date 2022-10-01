@@ -1,3 +1,4 @@
+import { enforceExhaustive } from "../switch";
 import { Ast, ObjectNode, PropertyNode, ValueNode } from "../types/Ast";
 
 const primitiveList = ["string", "number"] as const;
@@ -140,23 +141,26 @@ function parseProperties(state: State): PropertyNode[] {
     let value: ValueNode;
 
     const tokenType = state.tokenType();
-    if (tokenType === TokenType.Symbol) {
-      const token = state.token();
-      if (!isPrimitiveSymbol(token)) {
-        throw new Error(`Unknown symbol '${token}'`);
+    switch (tokenType) {
+      case TokenType.Symbol: {
+        const token = state.token();
+        if (!isPrimitiveSymbol(token)) {
+          throw new Error(`Unknown symbol '${token}'`);
+        }
+        value = { type: "primitive", valueType: token };
+        break;
       }
-      value = { type: "primitive", valueType: token };
-    } else if (tokenType === TokenType.Delimeter) {
-      if (state.token() !== "{") {
-        throw new Error(`Unexpected token '${state.token()}'`);
+      case TokenType.Delimeter: {
+        if (state.token() !== "{") {
+          throw new Error(`Unexpected token '${state.token()}'`);
+        }
+        value = parseObject(state);
+        break;
       }
-
-      // Object property
-      value = parseObject(state);
-    } else if (tokenType === TokenType.None) {
-      throw new Error(`Expected end of template`);
-    } else {
-      throw new Error(`Expected token type '${tokenType}'`);
+      case TokenType.None:
+        throw new Error(`Expected end of template`);
+      default:
+        enforceExhaustive(tokenType, `Unexpected token type`);
     }
 
     state.nextToken();
