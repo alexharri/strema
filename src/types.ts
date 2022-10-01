@@ -1,16 +1,11 @@
 import { StringJoin } from "./types/StringJoin";
 import { Trim, TrimLeft } from "./types/Trim";
 
-/**
- * We should never be able to create a value of this type legitimately.
- *
- * `ErrorMessageT` is our error message
- */
-interface CompileError<ErrorMessageT extends any[]> {
+interface CompileError<_Errors extends any[]> {
   /**
-   * There should never be a value of this type
+   * By adding this property, we prevent `{}` being assigned to it.
    */
-  readonly __compileError: never;
+  readonly __never: never;
 }
 
 type Key = string | number | symbol;
