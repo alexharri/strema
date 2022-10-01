@@ -69,26 +69,33 @@ class State {
     const c = this.currentCharacter();
 
     if (delimeters.has(c)) {
-      this._tokenType = TokenType.Delimeter;
-      this._token = c;
-      this.next();
+      this.nextDelimeterToken(c);
       return;
     }
 
     if (isAlpha(c)) {
-      let s = "";
-      let c = this.currentCharacter();
-      while (isAlpha(c)) {
-        s += c;
-        this.next();
-        c = this.currentCharacter();
-      }
-      this._tokenType = TokenType.Symbol;
-      this._token = s;
+      this.nextSymbolToken(c);
       return;
     }
 
     throw new Error(`Unexpected token '${c}'`);
+  }
+
+  private nextSymbolToken(c: string) {
+    let s = "";
+    while (isAlpha(c)) {
+      s += c;
+      this.next();
+      c = this.currentCharacter();
+    }
+    this._tokenType = TokenType.Symbol;
+    this._token = s;
+  }
+
+  private nextDelimeterToken(c: string) {
+    this._tokenType = TokenType.Delimeter;
+    this._token = c;
+    this.next();
   }
 
   private canIgnoreCurrentCharacter() {
