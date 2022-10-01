@@ -24,21 +24,37 @@ enum TokenType {
 
 class State {
   private index = 0;
-  public _token: string = "";
-  public _tokenType: TokenType = TokenType.None;
-
-  token(): string {
-    return this._token;
-  }
-  tokenType(): TokenType {
-    return this._tokenType as TokenType;
-  }
+  private _token: string = "";
+  private _tokenType: TokenType = TokenType.None;
 
   constructor(private s: string) {
     this.nextToken();
   }
 
-  public nextToken() {
+  // When comparing `state.token` to a literal, TypeScript narrows the
+  // type of `state.token` to the literal.
+  //
+  // `state.nextToken` modifies `state.token`, but TypeScript does not
+  // know that and so does not 'un-narrow' the type. This produces type
+  // errors when we compare `state.token` to other literals.
+  //
+  // Making `state.token()` a method allows us to opt out of type
+  // narrowing.
+  //
+  // See https://github.com/Microsoft/TypeScript/issues/9998
+  token(): string {
+    return this._token;
+  }
+
+  tokenType(): TokenType {
+    return this._tokenType;
+  }
+
+  currentCharacter() {
+    return this.s.substr(this.index, 1);
+  }
+
+  nextToken() {
     this._tokenType = TokenType.None;
     this._token = "";
 
@@ -86,10 +102,6 @@ class State {
 
   private next() {
     this.index++;
-  }
-
-  public currentCharacter() {
-    return this.s.substr(this.index, 1);
   }
 }
 
