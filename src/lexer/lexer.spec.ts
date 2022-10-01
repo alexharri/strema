@@ -120,6 +120,53 @@ describe("createAst", () => {
     expect(ast).toEqual(expectedAst);
   });
 
+  it("parses arrays of primitives", () => {
+    const ast = createAst("{a:string[]}");
+    const expectedAst: Ast = {
+      type: "object",
+      properties: [
+        {
+          type: "property",
+          key: "a",
+          value: {
+            type: "array",
+            value: { type: "primitive", valueType: "string" },
+          },
+        },
+      ],
+    };
+
+    expect(ast).toEqual(expectedAst);
+  });
+
+  it("parses arrays of objects", () => {
+    const ast = createAst("{a:{b:string}[]}");
+    const expectedAst: Ast = {
+      type: "object",
+      properties: [
+        {
+          type: "property",
+          key: "a",
+          value: {
+            type: "array",
+            value: {
+              type: "object",
+              properties: [
+                {
+                  type: "property",
+                  key: "b",
+                  value: { type: "primitive", valueType: "string" },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    };
+
+    expect(ast).toEqual(expectedAst);
+  });
+
   it("throws on an empty template", () => {
     const run0 = () => createAst("");
     const run1 = () => createAst("\n\n");

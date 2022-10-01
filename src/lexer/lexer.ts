@@ -1,6 +1,6 @@
-import { Ast, ObjectNode, PropertyNode } from "../types/Ast";
+import { Ast, ObjectNode, PropertyNode, ValueNode } from "../types/Ast";
 
-const delimeters = new Set([":", ";", "{", "}", ",", "<", ">"]);
+const delimeters = new Set([":", ";", "{", "}", "[", "]", "<", ">"]);
 const ignorable = new Set([" ", "\t", "\n"]);
 const primitiveSymbols = ["string", "number"] as const;
 const primitiveSymbolSet = new Set(primitiveSymbols);
@@ -117,29 +117,22 @@ function parseProperties(state: State): PropertyNode[] {
 
     state.nextToken();
 
+    let value: ValueNode;
+
     const tokenType = state.tokenType();
     if (tokenType === TokenType.Symbol) {
       const token = state.token();
       if (!isPrimitiveSymbol(token)) {
         throw new Error(`Unknown symbol '${token}'`);
       }
-      properties.push({
-        type: "property",
-        key,
-        value: { type: "primitive", valueType: token },
-      });
+      value = { type: "primitive", valueType: token };
     } else if (tokenType === TokenType.Delimeter) {
       if (state.token() !== "{") {
         throw new Error(`Unexpected token '${state.token()}'`);
       }
 
       // Object property
-      const objectProperty = parseObject(state);
-      properties.push({
-        type: "property",
-        key,
-        value: objectProperty,
-      });
+      value = parseObject(state);
     } else if (tokenType === TokenType.None) {
       throw new Error(`Expected end of template`);
     } else {
@@ -147,6 +140,25 @@ function parseProperties(state: State): PropertyNode[] {
     }
 
     state.nextToken();
+
+    if (state.tokenType() === TokenType.Delimeter && state.token() === "[") {
+      // Likely array modifier, for example:
+      //
+      //    a: string[]
+      //
+      state.nextToken();
+      if (state.tokenType() !== TokenType.Delimeter || state.token() !== "]") {
+        throw new Error(`Expected ']'`);
+      }
+      properties.push({
+        type: "property",
+        key,
+        value: { type: "array", value },
+      });
+      state.nextToken();
+    } else {
+      properties.push({ type: "property", key, value });
+    }
 
     /** @todo check for rules */
 

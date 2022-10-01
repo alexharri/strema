@@ -9,7 +9,7 @@ export interface ArrayNode {
   value: ValueNode;
 }
 
-type ValueNode = PrimitiveNode | ArrayNode | ObjectNode;
+export type ValueNode = PrimitiveNode | ArrayNode | ObjectNode;
 
 export interface PropertyNode {
   type: "property";
