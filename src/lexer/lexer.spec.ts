@@ -75,9 +75,40 @@ describe("createAst", () => {
               {
                 type: "property",
                 key: "b",
+                value: { type: "primitive", valueType: "string" },
+              },
+            ],
+          },
+        },
+      ],
+    };
+
+    expect(ast).toEqual(expectedAst);
+  });
+
+  it("parses nested object properties", () => {
+    const ast = createAst("{a:{b:{c:string}}}");
+    const expectedAst: Ast = {
+      type: "object",
+      properties: [
+        {
+          type: "property",
+          key: "a",
+          value: {
+            type: "object",
+            properties: [
+              {
+                type: "property",
+                key: "b",
                 value: {
-                  type: "primitive",
-                  valueType: "string",
+                  type: "object",
+                  properties: [
+                    {
+                      type: "property",
+                      key: "c",
+                      value: { type: "primitive", valueType: "string" },
+                    },
+                  ],
                 },
               },
             ],

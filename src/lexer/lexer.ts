@@ -23,14 +23,23 @@ enum TokenType {
 
 class State {
   private index = 0;
-  public token: string = "";
-  public tokenType: TokenType = TokenType.None;
+  public _token: string = "";
+  public _tokenType: TokenType = TokenType.None;
 
-  constructor(private s: string) {}
+  token(): string {
+    return this._token;
+  }
+  tokenType(): TokenType {
+    return this._tokenType as TokenType;
+  }
+
+  constructor(private s: string) {
+    this.nextToken();
+  }
 
   public nextToken() {
-    this.tokenType = TokenType.None;
-    this.token = "";
+    this._tokenType = TokenType.None;
+    this._token = "";
 
     while (this.canIgnoreCurrentCharacter()) {
       this.next();
@@ -43,8 +52,8 @@ class State {
     const c = this.currentCharacter();
 
     if (delimeters.has(c)) {
-      this.tokenType = TokenType.Delimeter;
-      this.token = c;
+      this._tokenType = TokenType.Delimeter;
+      this._token = c;
       this.next();
       return;
     }
@@ -57,8 +66,8 @@ class State {
         this.next();
         c = this.currentCharacter();
       }
-      this.tokenType = TokenType.Symbol;
-      this.token = s;
+      this._tokenType = TokenType.Symbol;
+      this._token = s;
       return;
     }
   }
@@ -82,10 +91,10 @@ class State {
 }
 
 function parseKey(state: State): string {
-  if (state.tokenType !== TokenType.Symbol) {
-    throw new Error(`Unexpected token '${state.token}'`);
+  if (state.tokenType() !== TokenType.Symbol) {
+    throw new Error(`Unexpected token '${state.token()}'`);
   }
-  return state.token;
+  return state.token();
 }
 
 function parseProperties(state: State): PropertyNode[] {
@@ -96,18 +105,16 @@ function parseProperties(state: State): PropertyNode[] {
     const key = parseKey(state);
 
     state.nextToken();
-    let tokenType = state.tokenType;
-    let token = state.token;
 
-    if (tokenType !== TokenType.Delimeter || token !== ":") {
+    if (state.tokenType() !== TokenType.Delimeter || state.token() !== ":") {
       throw new Error(`Expected ':'`);
     }
 
     state.nextToken();
-    tokenType = state.tokenType;
-    token = state.token;
 
+    const tokenType = state.tokenType();
     if (tokenType === TokenType.Symbol) {
+      const token = state.token();
       if (!isPrimitiveSymbol(token)) {
         throw new Error(`Unknown symbol '${token}'`);
       }
@@ -117,8 +124,8 @@ function parseProperties(state: State): PropertyNode[] {
         value: { type: "primitive", valueType: token },
       });
     } else if (tokenType === TokenType.Delimeter) {
-      if (token !== "{") {
-        throw new Error(`Unexpected token '${token}'`);
+      if (state.token() !== "{") {
+        throw new Error(`Unexpected token '${state.token()}'`);
       }
 
       // Object property
@@ -129,25 +136,21 @@ function parseProperties(state: State): PropertyNode[] {
         value: objectProperty,
       });
     } else if (tokenType === TokenType.None) {
-      throw new Error(`Expected end of file`);
+      throw new Error(`Expected end of template`);
     } else {
       throw new Error(`Expected token type '${tokenType}'`);
     }
 
     state.nextToken();
-    tokenType = state.tokenType;
-    token = state.token;
 
     /** @todo check for rules */
 
     // Skip over ';'
-    if (tokenType === TokenType.Delimeter && token === ";") {
+    if (state.tokenType() === TokenType.Delimeter && state.token() === ";") {
       state.nextToken();
-      tokenType = state.tokenType;
-      token = state.token;
     }
 
-    if (tokenType === TokenType.Delimeter && token === "}") {
+    if (state.tokenType() === TokenType.Delimeter && state.token() === "}") {
       findMore = false;
     }
   }
@@ -156,20 +159,13 @@ function parseProperties(state: State): PropertyNode[] {
 }
 
 function parseObject(state: State): ObjectNode {
-  // Invoking 'state.nextToken()' does not un-narrow 'state.token'
-  // once re-evaluated. We use the local 'token' variable to make
-  // TypeScript not narrow 'state.token'.
-  //
-  // See https://github.com/Microsoft/TypeScript/issues/9998
-  let token = state.token;
-  if (state.tokenType !== TokenType.Delimeter || token !== "{") {
+  if (state.tokenType() !== TokenType.Delimeter || state.token() !== "{") {
     throw new Error(`Expected {`);
   }
 
   state.nextToken();
 
-  token = state.token;
-  if (state.tokenType === TokenType.Delimeter && token === "}") {
+  if (state.tokenType() === TokenType.Delimeter && state.token() === "}") {
     // Immediately closed object
     return { type: "object", properties: [] };
   }
@@ -180,11 +176,10 @@ function parseObject(state: State): ObjectNode {
 
 export function createAst(s: string): Ast {
   const state = new State(s);
-  state.nextToken();
   const out = parseObject(state);
 
   state.nextToken();
-  if (state.tokenType !== TokenType.None) {
+  if (state.tokenType() !== TokenType.None) {
     throw new Error("Expected end of template");
   }
 
