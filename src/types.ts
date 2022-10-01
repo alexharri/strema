@@ -144,15 +144,4 @@ type _Parse<T extends string> = T extends `{${infer R}}`
     : never
   : CompileError<[`Expected {...}, got`, T]>;
 
-type Parse<T extends string> = Resolve<_Parse<Trim<T>>>;
-
-type Out = Parse<`{
-  a: string[] [email] = "test";
-  b: number [positive];
-  c: {
-    d: string;
-    e: {
-      hello: boolean;
-    }
-  }[];
-}`>;
+export type Parse<T extends string> = Resolve<_Parse<Trim<T>>>;
