@@ -1,24 +1,16 @@
 import { Ast } from "../types/Ast";
-import { createAst } from "./lexer";
+import { astFromString } from "./astFromString";
 
-describe("createAst", () => {
+describe("astFromString", () => {
   it("parses an empty object with no properties", () => {
-    const ast0 = createAst("{}");
-    const ast1 = createAst("    {}");
-    const ast2 = createAst("    {} \n");
-    const ast3 = createAst(" \n{\n\n}\n ");
-    const expectedAst: Ast = {
-      type: "object",
-      properties: [],
-    };
+    const ast = astFromString("{}");
+    const expectedAst: Ast = { type: "object", properties: [] };
 
-    for (const ast of [ast0, ast1, ast2, ast3]) {
-      expect(ast).toEqual(expectedAst);
-    }
+    expect(ast).toEqual(expectedAst);
   });
 
   it("parses a single primitive property", () => {
-    const ast_str = createAst("{a:string;}");
+    const ast_str = astFromString("{a:string;}");
     const expectedAst: Ast = {
       type: "object",
       properties: [
@@ -34,7 +26,7 @@ describe("createAst", () => {
   });
 
   it("parses multiple primitive properties", () => {
-    const ast_str = createAst("{a:string;b:number}");
+    const ast_str = astFromString("{a:string;b:number}");
     const expectedAst: Ast = {
       type: "object",
       properties: [
@@ -55,14 +47,14 @@ describe("createAst", () => {
   });
 
   it("throws an error for non-primitive property symbols", () => {
-    const run = () => createAst("{a:unknown;}");
+    const run = () => astFromString("{a:unknown;}");
     const errorMessage = `Unknown symbol 'unknown'`;
 
     expect(run).toThrow(errorMessage);
   });
 
   it("parses object properties", () => {
-    const ast = createAst("{a:{b:string}}");
+    const ast = astFromString("{a:{b:string}}");
     const expectedAst: Ast = {
       type: "object",
       properties: [
@@ -87,7 +79,7 @@ describe("createAst", () => {
   });
 
   it("parses nested object properties", () => {
-    const ast = createAst("{a:{b:{c:string}}}");
+    const ast = astFromString("{a:{b:{c:string}}}");
     const expectedAst: Ast = {
       type: "object",
       properties: [
@@ -121,7 +113,7 @@ describe("createAst", () => {
   });
 
   it("parses arrays of primitives", () => {
-    const ast = createAst("{a:string[]}");
+    const ast = astFromString("{a:string[]}");
     const expectedAst: Ast = {
       type: "object",
       properties: [
@@ -140,7 +132,7 @@ describe("createAst", () => {
   });
 
   it("parses arrays of objects", () => {
-    const ast = createAst("{a:{b:string}[]}");
+    const ast = astFromString("{a:{b:string}[]}");
     const expectedAst: Ast = {
       type: "object",
       properties: [
@@ -168,9 +160,9 @@ describe("createAst", () => {
   });
 
   it("throws on an empty template", () => {
-    const run0 = () => createAst("");
-    const run1 = () => createAst("\n\n");
-    const run2 = () => createAst("\n \t");
+    const run0 = () => astFromString("");
+    const run1 = () => astFromString("\n\n");
+    const run2 = () => astFromString("\n \t");
 
     for (const run of [run0, run1, run2]) {
       expect(run).toThrow(`Expected '{'`);
@@ -178,10 +170,10 @@ describe("createAst", () => {
   });
 
   it("throws if a closing brace is not provided for an object", () => {
-    const run0 = () => createAst("{");
-    const run1 = () => createAst("{a:string");
-    const run2 = () => createAst("{a:string;b:number");
-    const run3 = () => createAst("{a:string;b:{c:string};");
+    const run0 = () => astFromString("{");
+    const run1 = () => astFromString("{a:string");
+    const run2 = () => astFromString("{a:string;b:number");
+    const run3 = () => astFromString("{a:string;b:{c:string};");
 
     for (const run of [run0, run1, run2, run3]) {
       expect(run).toThrow(`Unexpected end of template`);
@@ -189,15 +181,15 @@ describe("createAst", () => {
   });
 
   it("throws if a value is not provided for a property", () => {
-    const unexpectedSemicolon = () => createAst("{a:;}");
-    const unexpectedClosingBrace = () => createAst("{a:}");
+    const unexpectedSemicolon = () => astFromString("{a:;}");
+    const unexpectedClosingBrace = () => astFromString("{a:}");
 
     expect(unexpectedSemicolon).toThrow(`Unexpected token ';'`);
     expect(unexpectedClosingBrace).toThrow(`Unexpected token '}'`);
   });
 
   it("throws on tokens not in template syntax", () => {
-    const unexpectedAt = () => createAst("{a:@;}");
+    const unexpectedAt = () => astFromString("{a:@;}");
 
     expect(unexpectedAt).toThrow(`Unexpected token '@'`);
   });

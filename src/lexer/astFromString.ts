@@ -191,7 +191,7 @@ function parseObject(state: State): ObjectNode {
   return { type: "object", properties };
 }
 
-export function createAst(s: string): Ast {
+export function astFromString(s: string): Ast {
   const state = new State(s);
   const out = parseObject(state);
 
