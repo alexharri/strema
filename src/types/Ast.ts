@@ -4,13 +4,6 @@ export interface PrimitiveNode {
   // Eventually, we will add rules here
 }
 
-export interface ArrayNode {
-  type: "array";
-  value: ValueNode;
-}
-
-export type ValueNode = PrimitiveNode | ArrayNode | ObjectNode;
-
 export interface PropertyNode {
   type: "property";
   key: string;
@@ -21,5 +14,12 @@ export interface ObjectNode {
   type: "object";
   properties: PropertyNode[];
 }
+
+export interface ArrayNode {
+  type: "array";
+  value: ValueNode;
+}
+
+export type ValueNode = PrimitiveNode | ArrayNode | ObjectNode;
 
 export type Ast = ObjectNode;
