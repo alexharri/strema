@@ -63,7 +63,6 @@ type TokenToValue = {
   number: number;
 };
 
-// type ParseToken<T extends string> = T;
 type ParseToken<T extends string> = T extends Token
   ? TokenToValue[T]
   : CompileError<
