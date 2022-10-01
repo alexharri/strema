@@ -136,7 +136,7 @@ function parseProperties(state: State): PropertyNode[] {
 
     state.nextToken();
 
-    if (state.tokenType() !== TokenType.Delimeter || state.token() !== ":") {
+    if (!state.atDelimeter(":")) {
       throw new Error(`Expected ':'`);
     }
 
