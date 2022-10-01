@@ -148,4 +148,10 @@ describe("createAst", () => {
     expect(unexpectedSemicolon).toThrow(`Unexpected token ';'`);
     expect(unexpectedClosingBrace).toThrow(`Unexpected token '}'`);
   });
+
+  it("throws on tokens not in template syntax", () => {
+    const unexpectedAt = () => createAst("{a:@;}");
+
+    expect(unexpectedAt).toThrow(`Unexpected token '@'`);
+  });
 });

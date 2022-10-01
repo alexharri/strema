@@ -70,6 +70,8 @@ class State {
       this._token = s;
       return;
     }
+
+    throw new Error(`Unexpected token '${c}'`);
   }
 
   private canIgnoreCurrentCharacter() {
