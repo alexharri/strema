@@ -1,7 +1,7 @@
 import { Ast } from "../types/Ast";
 import { createAst } from "./lexer";
 
-describe("parseObject", () => {
+describe("createAst", () => {
   it("parses an empty object with no properties", () => {
     const ast0 = createAst("{}");
     const ast1 = createAst("    {}");
@@ -59,5 +59,33 @@ describe("parseObject", () => {
     const errorMessage = `Unknown symbol 'unknown'`;
 
     expect(run).toThrow(errorMessage);
+  });
+
+  it("parses object properties", () => {
+    const ast = createAst("{a:{b:string}}");
+    const expectedAst: Ast = {
+      type: "object",
+      properties: [
+        {
+          type: "property",
+          key: "a",
+          value: {
+            type: "object",
+            properties: [
+              {
+                type: "property",
+                key: "b",
+                value: {
+                  type: "primitive",
+                  valueType: "string",
+                },
+              },
+            ],
+          },
+        },
+      ],
+    };
+
+    expect(ast).toEqual(expectedAst);
   });
 });

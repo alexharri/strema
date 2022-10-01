@@ -107,19 +107,32 @@ function parseProperties(state: State): PropertyNode[] {
     tokenType = state.tokenType;
     token = state.token;
 
-    if (tokenType !== TokenType.Symbol) {
-      /** @todo implement object properties */
-      throw new Error(`Expected symbol`);
-    }
+    if (tokenType === TokenType.Symbol) {
+      if (!isPrimitiveSymbol(token)) {
+        throw new Error(`Unknown symbol '${token}'`);
+      }
+      properties.push({
+        type: "property",
+        key,
+        value: { type: "primitive", valueType: token },
+      });
+    } else if (tokenType === TokenType.Delimeter) {
+      if (token !== "{") {
+        throw new Error(`Unexpected token '${token}'`);
+      }
 
-    if (!isPrimitiveSymbol(token)) {
-      throw new Error(`Unknown symbol '${token}'`);
+      // Object property
+      const objectProperty = parseObject(state);
+      properties.push({
+        type: "property",
+        key,
+        value: objectProperty,
+      });
+    } else if (tokenType === TokenType.None) {
+      throw new Error(`Expected end of file`);
+    } else {
+      throw new Error(`Expected token type '${tokenType}'`);
     }
-    properties.push({
-      type: "property",
-      key,
-      value: { type: "primitive", valueType: token },
-    });
 
     state.nextToken();
     tokenType = state.tokenType;
