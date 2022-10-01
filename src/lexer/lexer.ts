@@ -1,7 +1,19 @@
-import { Ast, ObjectNode } from "../types/Ast";
+import { Ast, ObjectNode, PropertyNode } from "../types/Ast";
 
 const delimeters = new Set([":", ";", "{", "}", ",", "<", ">"]);
 const ignorable = new Set([" ", "\t", "\n"]);
+const primitiveSymbols = ["string", "number"] as const;
+const primitiveSymbolSet = new Set(primitiveSymbols);
+
+type PrimitiveSymbol = typeof primitiveSymbols[number];
+
+function isPrimitiveSymbol(s: string): s is PrimitiveSymbol {
+  return primitiveSymbolSet.has(s as PrimitiveSymbol);
+}
+
+function isAlpha(c: string) {
+  return /^[a-zA-Z]$/.test(c);
+}
 
 enum TokenType {
   None = 0,
@@ -29,10 +41,24 @@ class State {
     }
 
     const c = this.currentCharacter();
+
     if (delimeters.has(c)) {
       this.tokenType = TokenType.Delimeter;
       this.token = c;
       this.next();
+      return;
+    }
+
+    if (isAlpha(c)) {
+      let s = "";
+      let c = this.currentCharacter();
+      while (isAlpha(c)) {
+        s += c;
+        this.next();
+        c = this.currentCharacter();
+      }
+      this.tokenType = TokenType.Symbol;
+      this.token = s;
       return;
     }
   }
@@ -55,6 +81,67 @@ class State {
   }
 }
 
+function parseKey(state: State): string {
+  if (state.tokenType !== TokenType.Symbol) {
+    throw new Error(`Unexpected token '${state.token}'`);
+  }
+  return state.token;
+}
+
+function parseProperties(state: State): PropertyNode[] {
+  let findMore = true;
+  const properties: PropertyNode[] = [];
+
+  while (findMore) {
+    const key = parseKey(state);
+
+    state.nextToken();
+    let tokenType = state.tokenType;
+    let token = state.token;
+
+    if (tokenType !== TokenType.Delimeter || token !== ":") {
+      throw new Error(`Expected ':'`);
+    }
+
+    state.nextToken();
+    tokenType = state.tokenType;
+    token = state.token;
+
+    if (tokenType !== TokenType.Symbol) {
+      /** @todo implement object properties */
+      throw new Error(`Expected symbol`);
+    }
+
+    if (!isPrimitiveSymbol(token)) {
+      throw new Error(`Unknown symbol '${token}'`);
+    }
+    properties.push({
+      type: "property",
+      key,
+      value: { type: "primitive", valueType: token },
+    });
+
+    state.nextToken();
+    tokenType = state.tokenType;
+    token = state.token;
+
+    /** @todo check for rules */
+
+    // Skip over ';'
+    if (tokenType === TokenType.Delimeter && token === ";") {
+      state.nextToken();
+      tokenType = state.tokenType;
+      token = state.token;
+    }
+
+    if (tokenType === TokenType.Delimeter && token === "}") {
+      findMore = false;
+    }
+  }
+
+  return properties;
+}
+
 function parseObject(state: State): ObjectNode {
   // Invoking 'state.nextToken()' does not un-narrow 'state.token'
   // once re-evaluated. We use the local 'token' variable to make
@@ -74,7 +161,8 @@ function parseObject(state: State): ObjectNode {
     return { type: "object", properties: [] };
   }
 
-  throw new Error("Property parsing not implemented");
+  const properties = parseProperties(state);
+  return { type: "object", properties };
 }
 
 export function createAst(s: string): Ast {

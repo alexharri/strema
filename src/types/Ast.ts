@@ -12,6 +12,7 @@ export interface ArrayNode {
 type ValueNode = PrimitiveNode | ArrayNode | ObjectNode;
 
 export interface PropertyNode {
+  type: "property";
   key: string;
   value: ValueNode;
 }

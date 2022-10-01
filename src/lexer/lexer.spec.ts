@@ -16,4 +16,48 @@ describe("parseObject", () => {
       expect(ast).toEqual(expectedAst);
     }
   });
+
+  it("parses a single primitive property", () => {
+    const ast_str = createAst("{a:string;}");
+    const expectedAst: Ast = {
+      type: "object",
+      properties: [
+        {
+          type: "property",
+          key: "a",
+          value: { type: "primitive", valueType: "string" },
+        },
+      ],
+    };
+
+    expect(ast_str).toEqual(expectedAst);
+  });
+
+  it("parses multiple primitive properties", () => {
+    const ast_str = createAst("{a:string;b:number}");
+    const expectedAst: Ast = {
+      type: "object",
+      properties: [
+        {
+          type: "property",
+          key: "a",
+          value: { type: "primitive", valueType: "string" },
+        },
+        {
+          type: "property",
+          key: "b",
+          value: { type: "primitive", valueType: "number" },
+        },
+      ],
+    };
+
+    expect(ast_str).toEqual(expectedAst);
+  });
+
+  it("throws an error for non-primitive property symbols", () => {
+    const run = () => createAst("{a:unknown;}");
+    const errorMessage = `Unknown symbol 'unknown'`;
+
+    expect(run).toThrow(errorMessage);
+  });
 });
