@@ -10,7 +10,7 @@ describe("astFromString", () => {
   });
 
   it("parses a single primitive property", () => {
-    const ast_str = astFromString("{a:string;}");
+    const ast = astFromString("{a:string;}");
     const expectedAst: Ast = {
       type: "object",
       properties: [
@@ -22,11 +22,11 @@ describe("astFromString", () => {
       ],
     };
 
-    expect(ast_str).toEqual(expectedAst);
+    expect(ast).toEqual(expectedAst);
   });
 
   it("parses multiple primitive properties", () => {
-    const ast_str = astFromString("{a:string;b:number}");
+    const ast = astFromString("{a:string;b:number}");
     const expectedAst: Ast = {
       type: "object",
       properties: [
@@ -43,7 +43,7 @@ describe("astFromString", () => {
       ],
     };
 
-    expect(ast_str).toEqual(expectedAst);
+    expect(ast).toEqual(expectedAst);
   });
 
   it("throws an error for non-primitive property symbols", () => {
