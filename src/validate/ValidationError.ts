@@ -13,6 +13,7 @@ interface Options {
 export class ValidationError extends Error {
   value: unknown;
   path: string;
+  pathParts: string[];
 
   constructor(options: Options) {
     super();
@@ -21,6 +22,7 @@ export class ValidationError extends Error {
     this.message = options.message;
     this.value = options.value;
     this.path = stringifyPath(options.ctx.path);
+    this.pathParts = options.ctx.path;
 
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, ValidationError);
