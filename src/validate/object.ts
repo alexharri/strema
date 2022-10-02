@@ -1,6 +1,7 @@
 import { typeAsString } from "../format/typeAsString";
 import { enforceExhaustive } from "../switch";
 import { PropertyNode } from "../types/Ast";
+import { validatePrimitive } from "./primitive";
 
 /**
  * @returns empty string if valid
@@ -29,7 +30,7 @@ export function validateObject(
       case "array":
         throw new Error(`Not implemented`);
       case "primitive":
-        throw new Error(`Not implemented`);
+        return validatePrimitive(value, valueSpec);
       default:
         enforceExhaustive(type, "Unexpected value type");
     }
