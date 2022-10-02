@@ -9,9 +9,9 @@ export function compileSchema<T extends string>(template: T): Schema<Parse<T>> {
 
   const schema: Schema<Parse<T>> = {
     parseSync: (value) => {
-      const errorMessage = validateObject(value, ast.properties);
-      if (errorMessage) {
-        throw new Error(errorMessage);
+      const err = validateObject(value, ast.properties, { path: [] });
+      if (err) {
+        throw err;
       }
       return copyObject(value, ast) as Parse<T>;
     },

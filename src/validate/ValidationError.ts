@@ -1,7 +1,9 @@
+import { ValidationContext } from "../types/ValidationContext";
+
 interface Options {
   message: string;
-  value: number;
-  path: string;
+  value: unknown;
+  ctx: ValidationContext;
 }
 
 export default class ValidationError extends Error {
@@ -14,7 +16,7 @@ export default class ValidationError extends Error {
     this.name = "ValidationError";
     this.message = options.message;
     this.value = options.value;
-    this.path = options.path;
+    this.path = options.ctx.path.join(".");
 
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, ValidationError);
