@@ -11,13 +11,12 @@ export function validateObject(
   properties: PropertyNode[],
   ctx: ValidationContext
 ): ValidationError | null {
-  const isNotObjectValue = typeof obj !== "object";
   const isNullOrUndefined = obj === undefined || obj === null;
-
   if (isNullOrUndefined) {
     return null;
   }
 
+  const isNotObjectValue = typeof obj !== "object";
   if (isNotObjectValue) {
     return new ValidationError({
       message: `Expected object value, got ${typeAsString(obj)}`,
