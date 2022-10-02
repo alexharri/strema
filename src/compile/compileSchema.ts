@@ -15,7 +15,7 @@ export function compileSchema<T extends string>(template: T): Schema<Parse<T>> {
       }
       return copyObject(value, ast) as Parse<T>;
     },
-    __value: null!,
+    __valueType: null!,
   };
 
   return schema;
