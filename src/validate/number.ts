@@ -22,7 +22,7 @@ export function validateNumber(
     });
   }
 
-  if (!isNullOrUndefined && !Number.isFinite(value)) {
+  if (!Number.isFinite(value)) {
     return new ValidationError({
       message: `Expected finite number value, got ${value}`,
       value,
