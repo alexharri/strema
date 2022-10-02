@@ -21,4 +21,15 @@ describe("compileSchema", () => {
     expect(parsed === value).toEqual(false);
     expect(parsed.a === value.a).toEqual(false);
   });
+
+  it("only copies the properties specified in the schema template", () => {
+    const schema = compileSchema(`{ a: number; b: number; }`);
+    const value = { a: 1, b: 2, c: 3 };
+
+    const parsed = schema.parseSync(value);
+
+    expect(parsed).toEqual({ a: 1, b: 2 });
+    // The original value should not be modified
+    expect(value).toEqual({ a: 1, b: 2, c: 3 });
+  });
 });
