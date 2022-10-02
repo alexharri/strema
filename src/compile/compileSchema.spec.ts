@@ -1,4 +1,5 @@
 import { SchemaValue } from "../types/Schema";
+import { areValidationErrorsEqual } from "../util/compareError";
 import { ValidationError } from "../validate/ValidationError";
 import { compileSchema } from "./compileSchema";
 
@@ -32,5 +33,25 @@ describe("compileSchema", () => {
     expect(parsed).toEqual({ a: 1, b: 2 });
     // The original value should not be modified
     expect(value).toEqual({ a: 1, b: 2, c: 3 });
+  });
+
+  it("throws an error when a value is of the wrong type", () => {
+    const schema = compileSchema(`{ a: number }`);
+    const value = { a: "string" };
+    const parse = () => schema.parseSync(value);
+    const expectedError = new ValidationError({
+      message: "Expected number value, got string",
+      value: "string",
+      ctx: { path: ["a"] },
+    });
+
+    let thrown!: ValidationError;
+    try {
+      parse();
+    } catch (e) {
+      thrown = e;
+    }
+
+    expect(areValidationErrorsEqual(thrown, expectedError)).toEqual(true);
   });
 });
