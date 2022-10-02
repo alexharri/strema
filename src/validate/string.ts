@@ -8,19 +8,18 @@ export function validateString(
   rules: StringRule[],
   ctx: ValidationContext
 ): ValidationError | null {
-  const isNotStringValue = typeof value !== "string";
   const isNullOrUndefined = value === undefined || value === null;
+  if (isNullOrUndefined) {
+    return null;
+  }
 
-  if (!isNullOrUndefined && isNotStringValue) {
+  const isNotStringValue = typeof value !== "string";
+  if (isNotStringValue) {
     return new ValidationError({
       message: `Expected string value, got ${typeAsString(value)}`,
       value,
       ctx,
     });
-  }
-
-  if (isNullOrUndefined) {
-    return null;
   }
 
   /** @todo perform rule checks */
