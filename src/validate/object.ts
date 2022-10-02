@@ -29,7 +29,7 @@ export function validateObject(
       case "object":
         return validateObject(value, valueSpec.properties);
       case "array":
-        return validateArray(value, valueSpec.value);
+        return validateArray(value as unknown[], valueSpec);
       case "primitive":
         return validatePrimitive(value, valueSpec);
       default:
