@@ -1,6 +1,7 @@
 import { typeAsString } from "../format/typeAsString";
 import { enforceExhaustive } from "../switch";
 import { PropertyNode } from "../types/Ast";
+import { validateArray } from "./array";
 import { validatePrimitive } from "./primitive";
 
 /**
@@ -28,7 +29,7 @@ export function validateObject(
       case "object":
         return validateObject(value, valueSpec.properties);
       case "array":
-        throw new Error(`Not implemented`);
+        return validateArray(value, valueSpec.value);
       case "primitive":
         return validatePrimitive(value, valueSpec);
       default:
