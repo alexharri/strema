@@ -2,6 +2,7 @@ import { astFromString } from "../ast/astFromString";
 import { Parse } from "../types";
 import { Schema } from "../types/Schema";
 import { validateObject } from "../validate/object";
+import { copyObject } from "../copy/copyObject";
 
 export function compileSchema<T extends string>(template: T): Schema<Parse<T>> {
   const ast = astFromString(template);
@@ -12,7 +13,7 @@ export function compileSchema<T extends string>(template: T): Schema<Parse<T>> {
       if (errorMessage) {
         throw new Error(errorMessage);
       }
-      return value as Parse<T>;
+      return copyObject(value, ast) as Parse<T>;
     },
   };
 
