@@ -6,9 +6,6 @@ import { validateObject } from "./object";
 import { validatePrimitive } from "./primitive";
 import { ValidationError } from "./ValidationError";
 
-/**
- * @returns empty string if valid
- */
 export function validateArray(
   arr: unknown[],
   spec: ArrayNode,

@@ -3,9 +3,6 @@ import { StringRule } from "../types/Rule";
 import { ValidationContext } from "../types/ValidationContext";
 import { ValidationError } from "./ValidationError";
 
-/**
- * @returns empty string if valid
- */
 export function validateString(
   value: unknown,
   rules: StringRule[],

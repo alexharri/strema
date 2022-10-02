@@ -6,9 +6,6 @@ import { validateNumber } from "./number";
 import { validateString } from "./string";
 import { ValidationError } from "./ValidationError";
 
-/**
- * @returns empty string if valid
- */
 export function validatePrimitive(
   value: unknown,
   spec: PrimitiveNode,
