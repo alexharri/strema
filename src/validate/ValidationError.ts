@@ -1,7 +1,14 @@
 import { ValidationContext } from "../types/ValidationContext";
 
 function stringifyPath(path: string[]) {
-  return path.join(".");
+  let out = "";
+  for (const part of path) {
+    if (out && !part.startsWith("[")) {
+      out += ".";
+    }
+    out += part;
+  }
+  return out;
 }
 
 interface Options {
@@ -12,8 +19,8 @@ interface Options {
 
 export class ValidationError extends Error {
   value: unknown;
-  path: string;
-  pathParts: string[];
+  path!: string;
+  pathParts!: string[];
 
   constructor(options: Options) {
     super();
@@ -21,11 +28,20 @@ export class ValidationError extends Error {
     this.name = "ValidationError";
     this.message = options.message;
     this.value = options.value;
-    this.path = stringifyPath(options.ctx.path);
-    this.pathParts = options.ctx.path;
+    this.setPath(options.ctx.path);
 
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, ValidationError);
     }
+  }
+
+  static empty() {
+    return new ValidationError({ message: "", value: null, ctx: { path: [] } });
+  }
+
+  setPath(path: string[]) {
+    this.path = stringifyPath(path);
+    this.pathParts = path;
+    return this;
   }
 }

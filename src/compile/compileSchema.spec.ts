@@ -57,7 +57,7 @@ describe("compileSchema", () => {
       thrown = e;
     }
 
-    expect(thrown.path).toEqual("a.b.[2]");
+    expect(thrown.path).toEqual("a.b[2]");
   });
 
   it("contains the value that did not match the spec in the error", () => {
