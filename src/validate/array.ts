@@ -30,7 +30,10 @@ export function validateArray(
     });
   }
 
-  for (const value of arr) {
+  for (let i = 0; i < arr.length; i++) {
+    ctx.path.push(`[${i}]`);
+
+    const value = arr[i];
     const { type } = spec.value;
     switch (type) {
       case "object": {
@@ -51,6 +54,8 @@ export function validateArray(
       default:
         enforceExhaustive(type, "Unexpected value type");
     }
+
+    ctx.path.pop();
   }
 
   return null;

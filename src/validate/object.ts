@@ -30,6 +30,8 @@ export function validateObject(
   }
 
   for (const { key, value: valueSpec } of properties) {
+    ctx.path.push(key);
+
     const { type } = valueSpec;
     const value = (obj as Record<string, unknown>)[key];
     switch (type) {
@@ -51,6 +53,8 @@ export function validateObject(
       default:
         enforceExhaustive(type, "Unexpected value type");
     }
+
+    ctx.path.pop();
   }
 
   return null;
