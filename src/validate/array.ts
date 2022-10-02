@@ -4,7 +4,7 @@ import { ArrayNode } from "../types/Ast";
 import { ValidationContext } from "../types/ValidationContext";
 import { validateObject } from "./object";
 import { validatePrimitive } from "./primitive";
-import ValidationError from "./ValidationError";
+import { ValidationError } from "./ValidationError";
 
 /**
  * @returns empty string if valid

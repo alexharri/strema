@@ -4,7 +4,7 @@ import { PropertyNode } from "../types/Ast";
 import { ValidationContext } from "../types/ValidationContext";
 import { validateArray } from "./array";
 import { validatePrimitive } from "./primitive";
-import ValidationError from "./ValidationError";
+import { ValidationError } from "./ValidationError";
 
 /**
  * @returns empty string if valid

@@ -4,7 +4,7 @@ import { NumberRule, StringRule } from "../types/Rule";
 import { ValidationContext } from "../types/ValidationContext";
 import { validateNumber } from "./number";
 import { validateString } from "./string";
-import ValidationError from "./ValidationError";
+import { ValidationError } from "./ValidationError";
 
 /**
  * @returns empty string if valid

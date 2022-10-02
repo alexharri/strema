@@ -1,5 +1,5 @@
 export interface Schema<T> {
-  readonly parseSync: (value: T) => T;
+  readonly parseSync: (value: unknown) => T;
   readonly __value: T;
 }
 

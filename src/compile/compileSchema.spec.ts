@@ -1,4 +1,5 @@
 import { SchemaValue } from "../types/Schema";
+import { ValidationError } from "../validate/ValidationError";
 import { compileSchema } from "./compileSchema";
 
 describe("compileSchema", () => {

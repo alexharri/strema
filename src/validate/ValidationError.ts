@@ -6,7 +6,7 @@ interface Options {
   ctx: ValidationContext;
 }
 
-export default class ValidationError extends Error {
+export class ValidationError extends Error {
   value: unknown;
   path: string;
 
