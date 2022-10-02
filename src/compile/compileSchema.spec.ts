@@ -37,21 +37,53 @@ describe("compileSchema", () => {
 
   it("throws an error when a value is of the wrong type", () => {
     const schema = compileSchema(`{ a: number }`);
-    const value = { a: "string" };
-    const parse = () => schema.parseSync(value);
-    const expectedError = new ValidationError({
-      message: "Expected number value, got string",
-      value: "string",
-      ctx: { path: ["a"] },
-    });
-
     let thrown!: ValidationError;
+
     try {
-      parse();
+      schema.parseSync({ a: "string" });
     } catch (e) {
       thrown = e;
     }
 
-    expect(areValidationErrorsEqual(thrown, expectedError)).toEqual(true);
+    expect(thrown.message).toEqual("Expected number value, got string");
+  });
+
+  it("correctly constructs the error path", () => {
+    const schema = compileSchema(`{ a: { b: number[] } }`);
+    let thrown!: ValidationError;
+
+    try {
+      schema.parseSync({ a: { b: [0, 1, "2"] } });
+    } catch (e) {
+      thrown = e;
+    }
+
+    expect(thrown.path).toEqual("a.b.[2]");
+  });
+
+  it("contains the value that did not match the spec in the error", () => {
+    const schema = compileSchema(`{ a: { b: number[] } }`);
+    let thrown!: ValidationError;
+
+    try {
+      schema.parseSync({ a: { b: [0, 1, "2"] } });
+    } catch (e) {
+      thrown = e;
+    }
+
+    expect(thrown.value).toEqual("2");
+  });
+
+  it("throws an instance of ValidationError when an error occurs", () => {
+    const schema = compileSchema(`{ a: number }`);
+    let thrown!: ValidationError;
+
+    try {
+      schema.parseSync({ a: "string" });
+    } catch (e) {
+      thrown = e;
+    }
+
+    expect(thrown instanceof ValidationError).toEqual(true);
   });
 });
