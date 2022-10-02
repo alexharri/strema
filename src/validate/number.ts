@@ -8,19 +8,18 @@ export function validateNumber(
   rules: NumberRule[],
   ctx: ValidationContext
 ): ValidationError | null {
-  const isNotNumberValue = typeof value !== "number";
   const isNullOrUndefined = value === undefined || value === null;
+  if (isNullOrUndefined) {
+    return null;
+  }
 
-  if (!isNullOrUndefined && isNotNumberValue) {
+  const isNotNumberValue = typeof value !== "number";
+  if (isNotNumberValue) {
     return new ValidationError({
       message: `Expected number value, got ${typeAsString(value)}`,
       value,
       ctx,
     });
-  }
-
-  if (isNullOrUndefined) {
-    return null;
   }
 
   if (!isNullOrUndefined && !Number.isFinite(value)) {
