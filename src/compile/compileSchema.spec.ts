@@ -1,5 +1,4 @@
 import { SchemaValue } from "../types/Schema";
-import { areValidationErrorsEqual } from "../util/compareError";
 import { ValidationError } from "../validate/ValidationError";
 import { compileSchema } from "./compileSchema";
 
