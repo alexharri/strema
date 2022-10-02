@@ -1,3 +1,6 @@
 export interface Schema<T> {
-  parseSync: (value: unknown) => T;
+  readonly parseSync: (value: unknown) => T;
+  readonly __valueType: T;
 }
+
+export type SchemaValue<S extends Schema<any>> = S["__valueType"];
