@@ -1,50 +1,20 @@
 import fs from "fs";
 import path from "path";
 
-const srcDir = path.resolve(__dirname, "../src");
 const distDir = path.resolve(__dirname, "../dist");
+const buildConfigDir = path.resolve(__dirname, "../build");
 
-const fnFileNames = fs
-  .readdirSync(srcDir, { withFileTypes: true })
-  .filter((item) => item.isDirectory())
-  .map((item) => item.name);
-
-if (fnFileNames.length === 0) {
-  throw new Error(`Did not find any functions.`);
-}
-
-console.log("Found source .ts files for the following functions:\n");
-console.log(
-  fnFileNames.map((fileName) => `\t${fileName.split(".ts")[0]}`).join("\n")
+const exportedFunctionsString = fs.readFileSync(
+  path.resolve(buildConfigDir, "./EXPORTED_FUNCTIONS"),
+  "utf-8"
 );
-console.log(
-  "\nChecking that the appropriate .js, .esm.js and .d.ts files were emitted to ~/dist for each function.\n"
+const exportedTypesString = fs.readFileSync(
+  path.resolve(buildConfigDir, "./EXPORTED_TYPES"),
+  "utf-8"
 );
 
-for (const fileName of fnFileNames) {
-  const withoutDotTs = fileName.split(".ts")[0];
-  const fnDirPath = path.resolve(distDir, `./${withoutDotTs}`);
-
-  const filesThatShouldExist = [
-    "index.js",
-    "index.esm.js",
-    "index.d.ts",
-    `${withoutDotTs}.d.ts`,
-  ];
-
-  for (const file of filesThatShouldExist) {
-    const filePath = path.resolve(fnDirPath, file);
-    if (!fs.existsSync(filePath)) {
-      throw new Error(
-        `Expected '${file}' file to exist for function '${withoutDotTs}'.`
-      );
-    }
-  }
-
-  console.log(`\t✔ ${withoutDotTs}`);
-}
-
-console.log("\nEnsuring that the index.js file exports every function.\n");
+const exportedFunctions = exportedFunctionsString.split("\n").filter(Boolean);
+const exportedTypes = exportedTypesString.split("\n").filter(Boolean);
 
 const indexCjsFilePath = path.resolve(distDir, "./index.js");
 const indexEsmFilePath = path.resolve(distDir, "./index.esm.js");
@@ -56,22 +26,22 @@ const indexCjsExportStatementSet = new Set(
 );
 const indexEsmContent = fs.readFileSync(indexEsmFilePath, "utf8");
 
-for (const fileName of fnFileNames) {
-  const withoutDotTs = fileName.split(".ts")[0];
-  if (
-    !indexCjsExportStatementSet.has(
-      `exports.${withoutDotTs} = ${withoutDotTs};`
-    )
-  ) {
+console.log("\nEnsuring that index.js exports every expected function.\n");
+
+for (const functionName of exportedFunctions) {
+  const exportsFunction = indexCjsExportStatementSet.has(
+    `exports.${functionName} = ${functionName};`
+  );
+  if (!exportsFunction) {
     throw new Error(
-      `Did not find export statement in index.js bundle for '${withoutDotTs}'.`
+      `Did not find export statement in index.js for '${functionName}'.`
     );
   }
 
-  console.log(`\t✔ ${withoutDotTs}`);
+  console.log(`\t✔ ${functionName}`);
 }
 
-console.log("\nEnsuring that the index.esm.js file exports every function.\n");
+console.log("\nEnsuring that index.esm.js exports every expected function.\n");
 
 {
   // The end of index.esm.js should contain a line that exports every function:
@@ -85,19 +55,37 @@ console.log("\nEnsuring that the index.esm.js file exports every function.\n");
   const { exportsStr } = indexEsmContent.match(exportsRegex)!.groups!;
   const exportedFunctionsSet = new Set(exportsStr.split(", ").filter(Boolean));
 
-  for (const fileName of fnFileNames) {
-    const withoutDotTs = fileName.split(".ts")[0];
-    if (!exportedFunctionsSet.has(withoutDotTs)) {
+  for (const functionName of exportedFunctions) {
+    const exportsFunction = exportedFunctionsSet.has(functionName);
+    if (!exportsFunction) {
       throw new Error(
-        `Expected index.esm.js to export function '${withoutDotTs}'.`
+        `Did not find export statement in index.esm.js for '${functionName}'.`
       );
     }
 
-    console.log(`\t✔ ${withoutDotTs}`);
+    console.log(`\t✔ ${functionName}`);
   }
 }
 
-console.log("\nEnsuring that the index.d.ts file exports every function.\n");
+function collectExports(s: string, regex: RegExp, groupName: string) {
+  const out: string[] = [];
+  let match: RegExpExecArray | null;
+  while ((match = regex.exec(s))) {
+    const value = match.groups![groupName];
+    const parts = value
+      .split("\n")
+      .join("")
+      .split(",")
+      .map((s) => s.trim());
+    out.push(...parts);
+  }
+  return out;
+}
+
+const exportRegex =
+  /export\s*{\s*(?<exportsStr>([a-z]+(,\s*)?)+)\s*}\s*from\s*"[a-z0-9.\/]+";/gi;
+const exportTypeRegex =
+  /export\s*type\s*{\s*(?<exportsStr>([a-z]+(,\s*)?)+)\s*}\s*from\s*"[a-z0-9.\/]+";/gi;
 
 const indexDtsContent = fs.readFileSync(indexDtsFilePath, "utf8");
 const indexDtsExportStatementSet = new Set(
@@ -106,17 +94,35 @@ const indexDtsExportStatementSet = new Set(
     .filter((line) => line.startsWith("export { default as "))
 );
 
-for (const fileName of fnFileNames) {
-  const withoutDotTs = fileName.split(".ts")[0];
-  if (
-    !indexDtsExportStatementSet.has(
-      `export { default as ${withoutDotTs} } from "./${withoutDotTs}";`
-    )
-  ) {
+const exportedFunctionSet = new Set(
+  collectExports(indexDtsContent, exportRegex, "exportsStr")
+);
+const exportedTypeSet = new Set(
+  collectExports(indexDtsContent, exportTypeRegex, "exportsStr")
+);
+
+console.log(`\nEnsuring that index.d.ts exports every expected function.\n`);
+
+for (const functionName of exportedFunctions) {
+  const isExported = exportedFunctionSet.has(functionName);
+  if (!isExported) {
     throw new Error(
-      `Did not find export statement in index.d.ts bundle for '${withoutDotTs}'.`
+      `Did not find export statement in index.d.ts bundle for '${functionName}'.`
     );
   }
 
-  console.log(`\t✔ ${withoutDotTs}`);
+  console.log(`\t✔ ${functionName}`);
+}
+
+console.log(`\nEnsuring that index.d.ts exports every expected type.\n`);
+
+for (const typeName of exportedTypes) {
+  const isExported = exportedTypeSet.has(typeName);
+  if (!isExported) {
+    throw new Error(
+      `Did not find export statement in index.d.ts bundle for type '${typeName}'.`
+    );
+  }
+
+  console.log(`\t✔ ${typeName}`);
 }
