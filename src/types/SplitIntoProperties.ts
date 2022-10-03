@@ -1,5 +1,5 @@
 import { CompileError } from "./CompileError";
-import { RemoveWhitespaceStrings } from "./Whitespace";
+import { RemoveWhitespaceOnlyStringsFromTuple } from "./Whitespace";
 import { StringWrapper, WrapString } from "./WrapString";
 
 type OnMatchedObjectPropertyDuringSplit<
@@ -96,4 +96,4 @@ type _SplitIntoProperties<T extends string> =
 export type SplitIntoProperties<T extends string> =
   _SplitIntoProperties<T> extends CompileError<infer E>
     ? CompileError<E>
-    : RemoveWhitespaceStrings<_SplitIntoProperties<T>>;
+    : RemoveWhitespaceOnlyStringsFromTuple<_SplitIntoProperties<T>>;
