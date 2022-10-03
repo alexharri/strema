@@ -1,5 +1,5 @@
 import { astFromString } from "../ast/astFromString";
-import { Parse } from "../types";
+import { Parse } from "../types/Parse";
 import { Schema } from "../types/Schema";
 import { validateObject } from "../validate/object";
 import { copyObject } from "../copy/copyObject";

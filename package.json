@@ -7,6 +7,7 @@
     "test": "jest",
     "test:watch": "jest --watchAll",
     "test:ci": "jest --ci --coverage",
+    "test:types": "tsc --noEmit --diagnostics --project tsconfig.tscheck.json",
     "tscheck": "tsc --noEmit --skipLibCheck",
     "build": "npm run build:prepare && npm run build:bundle && npm run build:copy-files",
     "build:bundle": "rollup -c",
