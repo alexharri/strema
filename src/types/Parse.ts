@@ -1,4 +1,4 @@
-import { CompileError } from "./CompileError";
+import { CompileError as Err } from "./CompileError";
 import { Resolve } from "./Resolve";
 import { SplitIntoProperties } from "./SplitIntoProperties";
 import { StringJoin } from "./StringJoin";
@@ -19,9 +19,7 @@ type TokenToValue = {
 
 type ParseToken<T extends string> = T extends Token
   ? TokenToValue[T]
-  : CompileError<
-      [`Expected one of [${StringJoin<Tokens, ", ">}] but got '${T}'`]
-    >;
+  : Err<[`Expected one of [${StringJoin<Tokens, ", ">}] but got '${T}'`]>;
 
 type FindValue<T extends string> = T extends `Array<{${infer R}}>`
   ? _Parse<`{${R}}`>[]
@@ -36,11 +34,11 @@ type FindValue<T extends string> = T extends `Array<{${infer R}}>`
 type KeyValue<T extends string> = T extends `${infer K}:${infer Rest}`
   ? {
       key: K;
-      value: FindValue<TrimLeft<Rest>> extends CompileError<infer E>
-        ? CompileError<[`Failed to parse value of property '${K}'`, ...E]>
+      value: FindValue<TrimLeft<Rest>> extends Err<infer E>
+        ? Err<[`Failed to parse value of property '${K}'`, ...E]>
         : FindValue<TrimLeft<Rest>>;
     }
-  : CompileError<[`Expected key-value property, got '${T}'`]>;
+  : Err<[`Expected key-value property, got '${T}'`]>;
 
 export type ParseProperty<T extends string> = KeyValue<T> extends {
   key: infer K;
@@ -49,30 +47,28 @@ export type ParseProperty<T extends string> = KeyValue<T> extends {
   ? K extends string
     ? { [key in K]: V }
     : {}
-  : KeyValue<T> extends CompileError<infer E>
-  ? CompileError<E>
-  : CompileError<[`Failed to parse property '${T}'`]>;
+  : KeyValue<T> extends Err<infer E>
+  ? Err<E>
+  : Err<[`Failed to parse property '${T}'`]>;
 
-export type ParseProperties<T extends string[]> = T extends CompileError<
-  infer E
->
-  ? CompileError<E>
+export type ParseProperties<T extends string[]> = T extends Err<infer E>
+  ? Err<E>
   : {
       [P in keyof T]: ParseProperty<Trim<T[P]>>;
     };
 
 type _Parse<T extends string> = T extends `{${infer Content}}`
   ? SplitIntoProperties<Content> extends infer AfterSplit
-    ? AfterSplit extends CompileError<infer E>
-      ? CompileError<E>
+    ? AfterSplit extends Err<infer E>
+      ? Err<E>
       : AfterSplit extends string[]
       ? MergeArrayIntoObject<ParseProperties<AfterSplit>>
-      : CompileError<["Expected string[], got:", AfterSplit]>
+      : Err<["Expected string[], got:", AfterSplit]>
     : never
-  : CompileError<[`Expected {...}, got '${T}'`]>;
+  : Err<[`Expected {...}, got '${T}'`]>;
 
-export type Parse<T extends string> = _Parse<
-  RemoveWhitespace<T>
-> extends CompileError<infer E>
-  ? CompileError<E>
+export type Parse<T extends string> = _Parse<RemoveWhitespace<T>> extends Err<
+  infer E
+>
+  ? Err<E>
   : Resolve<_Parse<RemoveWhitespace<T>>>;
