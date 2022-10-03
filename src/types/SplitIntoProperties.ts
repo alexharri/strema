@@ -50,15 +50,30 @@ type JoinClosingBracesWithUnclosedObjectProperties<T extends string[]> =
   T extends [
     infer PrevProperty extends string,
     infer MaybeClosingBraces extends string,
-    ...infer Rest
+    ...infer Rest extends string[]
   ]
     ? Equals<
-        MaybeClosingBraces,
-        FilterString<MaybeClosingBraces, "}">
-      > extends true
-      ? [`${PrevProperty}${MaybeClosingBraces}`, ...Rest]
-      : T
+        StringLength<FilterString<PrevProperty, "{">>,
+        StringLength<FilterString<PrevProperty, "}">>
+      > extends false
+      ? JoinClosingBracesWithUnclosedObjectProperties<
+          [`${PrevProperty}${MaybeClosingBraces}`, ...Rest]
+        >
+      : [
+          PrevProperty,
+          ...JoinClosingBracesWithUnclosedObjectProperties<
+            [MaybeClosingBraces, ...Rest]
+          >
+        ]
     : T;
+
+type StringAsTuple<T extends string> = T extends ""
+  ? []
+  : T extends `${infer C}${infer Rest}`
+  ? [C, ...StringAsTuple<Rest>]
+  : never;
+
+type StringLength<T extends string> = StringAsTuple<T>["length"];
 
 type OnMatchedObjectPropertyDuringSplit<
   Before extends string,
