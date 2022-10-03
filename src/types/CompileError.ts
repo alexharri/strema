@@ -1,9 +1,6 @@
-export interface CompileError<Errors extends string[]> {
-  errors: Errors;
+export interface CompileError<_Errors extends string[]> {
   /**
-   * By adding this property, we prevent `{}` being assigned to it.
+   * By adding this property, we prevent `{}` being assigned to a `CompileError`.
    */
   readonly __never: never;
 }
-
-export type ErrorsIn<E> = E extends CompileError<infer Errors> ? Errors : never;
