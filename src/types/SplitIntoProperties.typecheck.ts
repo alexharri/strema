@@ -1,7 +1,5 @@
-import { CompileError } from "./CompileError";
-import { Parse } from "./Parse";
 import { SplitIntoProperties } from "./SplitIntoProperties";
-import { it, eq, not_eq } from "./Test";
+import { it, eq } from "./Test";
 
 it("resolves to an empty array if the template is empty", () => [
   eq<SplitIntoProperties<``>, []>(),

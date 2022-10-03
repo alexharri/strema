@@ -1,5 +1,5 @@
 import { RemoveWhitespace } from "./Whitespace";
-import { it, eq, not_eq } from "./Test";
+import { it, eq } from "./Test";
 
 it("removes newlines at the start and end of strings", () => [
   eq<RemoveWhitespace<"\nhello\n">, "hello">(),
