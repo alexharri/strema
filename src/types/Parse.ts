@@ -1,12 +1,6 @@
-import { StringJoin } from "./types/StringJoin";
-import { Trim, TrimLeft } from "./types/Trim";
-
-interface CompileError<_Errors extends any[]> {
-  /**
-   * By adding this property, we prevent `{}` being assigned to it.
-   */
-  readonly __never: never;
-}
+import { CompileError } from "./CompileError";
+import { StringJoin } from "./StringJoin";
+import { Trim, TrimLeft } from "./Trim";
 
 type Key = string | number | symbol;
 
@@ -66,7 +60,7 @@ type TokenToValue = {
 type ParseToken<T extends string> = T extends Token
   ? TokenToValue[T]
   : CompileError<
-      [`Expected one of ${StringJoin<Tokens, ", ">} but got '${T}'`]
+      [`Expected one of [${StringJoin<Tokens, ", ">}] but got '${T}'`]
     >;
 
 type FindValue<T extends string> = T extends `Array<{${infer R}}>`
@@ -80,34 +74,41 @@ type FindValue<T extends string> = T extends `Array<{${infer R}}>`
   : ParseToken<T>;
 
 type KeyValue<T extends string> = T extends `${infer K}:${infer Rest}`
-  ? { key: K; value: FindValue<TrimLeft<Rest>> }
-  : never;
+  ? {
+      key: K;
+      value: FindValue<TrimLeft<Rest>> extends CompileError<infer E>
+        ? CompileError<[`Failed to parse value of property '${K}'`, ...E]>
+        : FindValue<TrimLeft<Rest>>;
+    }
+  : CompileError<[`Expected key-value property, got '${T}'`]>;
 
-type ParseProperty<T extends string> = KeyValue<T> extends {
+export type ParseProperty<T extends string> = KeyValue<T> extends {
   key: infer K;
   value: infer V;
 }
   ? K extends string
     ? { [key in K]: V }
     : {}
-  : {};
+  : KeyValue<T> extends CompileError<infer E>
+  ? CompileError<E>
+  : CompileError<[`Failed to parse property '${T}'`]>;
 
-type ParseProperties<T extends string[]> = {
+export type ParseProperties<T extends string[]> = {
   [P in keyof T]: ParseProperty<Trim<T[P]>>;
 };
 
-type ExcludeFromTuple<T extends unknown[], Exclude> = T extends [
+type RemoveEmptyStrings<T extends unknown[]> = T extends [
   infer R,
   ...infer Rest
 ]
-  ? R extends Exclude
-    ? ExcludeFromTuple<Rest, Exclude>
-    : [R, ...ExcludeFromTuple<Rest, Exclude>]
+  ? R extends string
+    ? Trim<R> extends ""
+      ? RemoveEmptyStrings<Rest>
+      : [R, ...RemoveEmptyStrings<Rest>]
+    : []
   : [];
 
-type RemoveEmptyStrings<T extends string[]> = ExcludeFromTuple<T, "">;
-
-type SplitIntoProperties<T extends string> =
+export type SplitIntoProperties<T extends string> =
   T extends `${infer A}Array<{${infer O}}>${infer B}`
     ? SplitIntoProperties<A> extends [...infer R, infer Last]
       ? Last extends `${infer K}: `
@@ -136,6 +137,6 @@ type _Parse<T extends string> = T extends `{${infer R}}`
     ]
     ? MergeArrayIntoObject<U>
     : never
-  : CompileError<[`Expected {...}, got`, T]>;
+  : CompileError<[`Expected {...}, got '${T}'`]>;
 
 export type Parse<T extends string> = Resolve<_Parse<Trim<T>>>;
