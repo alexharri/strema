@@ -1,5 +1,5 @@
 import { CompileError } from "./CompileError";
-import { Parse, _SplitIntoProperties } from "./Parse";
+import { Parse } from "./Parse";
 import { it, eq, not_eq } from "./Test";
 
 it("returns an error if the string does not match '{...}'", () => [
