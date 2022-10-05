@@ -41,6 +41,21 @@ it("parses arrays of objects as properties", () => [
   eq<Parse<`{ a: Array<{ b: number }> }`>, { a: Array<{ b: number }> }>(),
 ]);
 
+it("parses nested object properties", () => [
+  eq<Parse<`{ a: { b: {} } }`>, { a: { b: {} } }>(),
+  eq<
+    Parse<`{ a: { b: string; c: { d: number } } }`>,
+    { a: { b: string; c: { d: number } } }
+  >(),
+]);
+
+it("parses multiple object properties", () => [
+  eq<
+    Parse<`{ a: { b: { c: number } }; d: { e: {}; f: {} } }`>,
+    { a: { b: { c: number } }; d: { e: {}; f: {} } }
+  >(),
+]);
+
 it("errors when an invalid symbol is provided for a property value", () => {
   type Err = [
     "Failed to parse value of property 'a'",
