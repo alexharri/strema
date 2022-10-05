@@ -44,7 +44,7 @@ import { StringWrapper, WrapString } from "./WrapString";
 // This type takes the closing braces ("}}") and joins them with the
 // previous property, resulting in:
 //
-//    ["a:{b:{c:{}}}", "d:string"]
+//    ["a:{b:{c:{};}}", "d:string"]
 //
 type JoinClosingBracesWithUnclosedObjectProperties<T extends string[]> =
   T extends [
