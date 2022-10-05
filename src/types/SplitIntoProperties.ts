@@ -57,7 +57,7 @@ type JoinClosingBracesWithUnclosedObjectProperties<T extends string[]> =
         StringLength<FilterString<PrevProperty, "}">>
       > extends false
       ? JoinClosingBracesWithUnclosedObjectProperties<
-          [`${PrevProperty}${MaybeClosingBraces}`, ...Rest]
+          [`${PrevProperty};${MaybeClosingBraces}`, ...Rest]
         >
       : [
           PrevProperty,

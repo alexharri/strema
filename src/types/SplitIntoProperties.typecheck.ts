@@ -46,7 +46,11 @@ it("does not split properties if ';' is not used by a separator", () => [
 it("does not split nested object properties", () => [
   eq<
     SplitIntoProperties<`a:{b:{c:{}}};d:string;e:{}`>,
-    [`a:{b:{c:{}}}`, `d:string`, `e:{}`]
+    [`a:{b:{c:{};}}`, `d:string`, `e:{}`]
+  >(),
+  eq<
+    SplitIntoProperties<`a:{b:{c:{};d:{};e:{}}}`>,
+    [`a:{b:{c:{};d:{};e:{};}}`]
   >(),
   eq<
     SplitIntoProperties<`a:{b:{c:{}}}[];d:string;e:{}`>,
