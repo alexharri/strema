@@ -31,6 +31,29 @@ it("requires a ';' beween properties", () => [
   not_eq<Parse<`{ a: string, b: number }`>, { a: string; b: number }>(),
 ]);
 
+it("parses arrays of primitives", () => [
+  eq<Parse<`{ a: string[]; }`>, { a: string[] }>(),
+  eq<
+    Parse<`{ a: string[]; b: { c: number[] } }`>,
+    { a: string[]; b: { c: number[] } }
+  >(),
+]);
+
+it("ignores rules in '<>' for primitives", () => [
+  eq<Parse<`{ a: string[] <abcd> }`>, { a: string[] }>(),
+  eq<
+    Parse<`{ a: string[] abcd }`>,
+    {
+      a: CompileError<
+        [
+          "Failed to parse value of property 'a'",
+          "Expected one of [string, number] but got 'string[]abcd'"
+        ]
+      >;
+    }
+  >(),
+]);
+
 it("parses objects as properties", () => [eq<Parse<`{ a: {} }`>, { a: {} }>()]);
 
 it("parses arrays of objects as properties", () => [

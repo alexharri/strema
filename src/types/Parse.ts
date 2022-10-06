@@ -21,15 +21,27 @@ type ParseToken<T extends string> = T extends Token
   ? TokenToValue[T]
   : Err<[`Expected one of [${StringJoin<Tokens, ", ">}] but got '${T}'`]>;
 
-type FindValue<T extends string> = T extends `Array<{${infer R}}>`
-  ? _Parse<`{${R}}`>[]
-  : T extends `{${infer R}}`
-  ? _Parse<`{${R}}`>
-  : T extends `${infer Token}[] ${string}`
-  ? ParseToken<Token>[]
-  : T extends `${infer Token} ${string}`
-  ? ParseToken<Token>
-  : ParseToken<T>;
+type FindValue<T extends string> =
+  // Array of objects
+  T extends `Array<{${infer R}}>`
+    ? _Parse<`{${R}}`>[]
+    : T extends `{${infer R}}`
+    ? _Parse<`{${R}}`>
+    : //
+    // Array of primitives (without rules)
+    T extends `${infer Token}[]`
+    ? ParseToken<Token>[]
+    : //
+    // Array of primitives (with rules)
+    T extends `${infer Token}[]<${string}>`
+    ? ParseToken<Token>[]
+    : //
+    // Primitive with rules
+    T extends `${infer Token}<${string}>`
+    ? ParseToken<Token>
+    : //
+      // When none of the above matched, we expect to find just a primitive
+      ParseToken<T>;
 
 type KeyValue<T extends string> = T extends `${infer K}:${infer Rest}`
   ? {
