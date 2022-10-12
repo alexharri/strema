@@ -127,64 +127,73 @@ function parseKey(state: State): string {
   return state.token();
 }
 
+function parseProperty(state: State): PropertyNode {
+  const key = parseKey(state);
+
+  state.nextToken();
+
+  if (!state.atDelimeter(":")) {
+    throw new Error(`Expected ':'`);
+  }
+
+  state.nextToken();
+
+  let value: ValueNode;
+
+  const tokenType = state.tokenType();
+  switch (tokenType) {
+    case TokenType.Symbol: {
+      const token = state.token();
+      if (!isPrimitiveSymbol(token)) {
+        throw new Error(`Unknown symbol '${token}'`);
+      }
+      value = { type: "primitive", valueType: token };
+      break;
+    }
+    case TokenType.Delimeter: {
+      if (state.token() !== "{") {
+        throw new Error(`Unexpected token '${state.token()}'`);
+      }
+      value = parseObject(state);
+      break;
+    }
+    case TokenType.None:
+      throw new Error(`Expected end of template`);
+    default:
+      enforceExhaustive(tokenType, `Unexpected token type`);
+  }
+
+  state.nextToken();
+
+  let property: PropertyNode;
+
+  if (state.atDelimeter("[")) {
+    state.nextToken();
+    if (!state.atDelimeter("]")) {
+      throw new Error(`Expected ']'`);
+    }
+    property = {
+      type: "property",
+      key,
+      value: { type: "array", value },
+    };
+    state.nextToken();
+  } else {
+    property = { type: "property", key, value };
+  }
+
+  /** @todo check for rules */
+
+  return property;
+}
+
 function parseProperties(state: State): PropertyNode[] {
   let expectMoreProperties = true;
   const properties: PropertyNode[] = [];
 
   while (expectMoreProperties) {
-    const key = parseKey(state);
-
-    state.nextToken();
-
-    if (!state.atDelimeter(":")) {
-      throw new Error(`Expected ':'`);
-    }
-
-    state.nextToken();
-
-    let value: ValueNode;
-
-    const tokenType = state.tokenType();
-    switch (tokenType) {
-      case TokenType.Symbol: {
-        const token = state.token();
-        if (!isPrimitiveSymbol(token)) {
-          throw new Error(`Unknown symbol '${token}'`);
-        }
-        value = { type: "primitive", valueType: token };
-        break;
-      }
-      case TokenType.Delimeter: {
-        if (state.token() !== "{") {
-          throw new Error(`Unexpected token '${state.token()}'`);
-        }
-        value = parseObject(state);
-        break;
-      }
-      case TokenType.None:
-        throw new Error(`Expected end of template`);
-      default:
-        enforceExhaustive(tokenType, `Unexpected token type`);
-    }
-
-    state.nextToken();
-
-    if (state.atDelimeter("[")) {
-      state.nextToken();
-      if (!state.atDelimeter("]")) {
-        throw new Error(`Expected ']'`);
-      }
-      properties.push({
-        type: "property",
-        key,
-        value: { type: "array", value },
-      });
-      state.nextToken();
-    } else {
-      properties.push({ type: "property", key, value });
-    }
-
-    /** @todo check for rules */
+    const property = parseProperty(state);
+    properties.push(property);
 
     const atPropertySeparator = state.atDelimeter(";");
     if (atPropertySeparator) {
