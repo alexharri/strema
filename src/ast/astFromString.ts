@@ -117,27 +117,7 @@ class State {
   }
 }
 
-function parseKey(state: State): string {
-  if (state.tokenType() === TokenType.None) {
-    throw new Error(`Unexpected end of template`);
-  }
-  if (state.tokenType() !== TokenType.Symbol) {
-    throw new Error(`Unexpected token '${state.token()}'`);
-  }
-  return state.token();
-}
-
-function parseProperty(state: State): PropertyNode {
-  const key = parseKey(state);
-
-  state.nextToken();
-
-  if (!state.atDelimeter(":")) {
-    throw new Error(`Expected ':'`);
-  }
-
-  state.nextToken();
-
+function parsePropertyValue(state: State): ValueNode {
   let value: ValueNode;
 
   const tokenType = state.tokenType();
@@ -164,6 +144,32 @@ function parseProperty(state: State): PropertyNode {
   }
 
   state.nextToken();
+
+  return value;
+}
+
+function parseKey(state: State): string {
+  if (state.tokenType() === TokenType.None) {
+    throw new Error(`Unexpected end of template`);
+  }
+  if (state.tokenType() !== TokenType.Symbol) {
+    throw new Error(`Unexpected token '${state.token()}'`);
+  }
+  return state.token();
+}
+
+function parseProperty(state: State): PropertyNode {
+  const key = parseKey(state);
+
+  state.nextToken();
+
+  if (!state.atDelimeter(":")) {
+    throw new Error(`Expected ':'`);
+  }
+
+  state.nextToken();
+
+  const value = parsePropertyValue(state);
 
   let property: PropertyNode;
 
