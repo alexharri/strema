@@ -1,10 +1,10 @@
 import { Ast } from "../types/Ast";
 import { parseObject } from "./parse/object";
-import { AstState } from "./state/AstState";
+import { ParserState } from "./state/ParserState";
 import { TokenType } from "./token";
 
 export function astFromString(s: string): Ast {
-  const state = new AstState(s);
+  const state = new ParserState(s);
   const out = parseObject(state);
 
   if (state.tokenType() !== TokenType.None) {

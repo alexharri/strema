@@ -7,7 +7,7 @@ function isAlpha(c: string) {
   return /^[a-zA-Z]$/.test(c);
 }
 
-export class AstState {
+export class ParserState {
   private index = 0;
   private _token: string = "";
   private _tokenType: TokenType = TokenType.None;

@@ -1,7 +1,7 @@
 import { enforceExhaustive } from "../../switch";
 import { ValueNode } from "../../types/Ast";
 import { parseObject } from "./object";
-import { AstState } from "../state/AstState";
+import { ParserState } from "../state/ParserState";
 import { TokenType } from "../token";
 
 const primitiveList = ["string", "number"] as const;
@@ -13,7 +13,7 @@ function isPrimitiveSymbol(s: string): s is PrimitiveSymbol {
   return primitives.has(s as PrimitiveSymbol);
 }
 
-export function parseValue(state: AstState): ValueNode {
+export function parseValue(state: ParserState): ValueNode {
   let value: ValueNode;
 
   const tokenType = state.tokenType();

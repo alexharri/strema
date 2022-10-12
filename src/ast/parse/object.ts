@@ -1,8 +1,8 @@
 import { ObjectNode } from "../../types/Ast";
 import { parseProperties } from "./property";
-import { AstState } from "../state/AstState";
+import { ParserState } from "../state/ParserState";
 
-export function parseObject(state: AstState): ObjectNode {
+export function parseObject(state: ParserState): ObjectNode {
   if (!state.atDelimeter("{")) {
     throw new Error(`Expected '{'`);
   }

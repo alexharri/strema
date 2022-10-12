@@ -1,9 +1,9 @@
 import { PropertyNode } from "../../types/Ast";
-import { AstState } from "../state/AstState";
+import { ParserState } from "../state/ParserState";
 import { TokenType } from "../token";
 import { parseValue } from "./value";
 
-function parseKey(state: AstState): string {
+function parseKey(state: ParserState): string {
   if (state.tokenType() === TokenType.None) {
     throw new Error(`Unexpected end of template`);
   }
@@ -13,7 +13,7 @@ function parseKey(state: AstState): string {
   return state.token();
 }
 
-function parseProperty(state: AstState): PropertyNode {
+function parseProperty(state: ParserState): PropertyNode {
   const key = parseKey(state);
 
   state.nextToken();
@@ -48,7 +48,7 @@ function parseProperty(state: AstState): PropertyNode {
   return property;
 }
 
-export function parseProperties(state: AstState): PropertyNode[] {
+export function parseProperties(state: ParserState): PropertyNode[] {
   let expectMoreProperties = true;
   const properties: PropertyNode[] = [];
 
