@@ -51,10 +51,6 @@ class State {
     return this._tokenType;
   }
 
-  currentCharacter() {
-    return this.s.substr(this.index, 1);
-  }
-
   atDelimeter(delimeter: string) {
     return this._tokenType === TokenType.Delimeter && this._token === delimeter;
   }
@@ -84,6 +80,10 @@ class State {
     }
 
     throw new Error(`Unexpected token '${c}'`);
+  }
+
+  private currentCharacter() {
+    return this.s.substr(this.index, 1);
   }
 
   private nextSymbolToken(c: string) {
