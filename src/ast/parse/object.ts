@@ -1,20 +1,27 @@
 import { ObjectNode } from "../../types/Ast";
 import { parseProperties } from "./property";
-import { State } from "../State";
-import { TokenType } from "../token";
+import { AstState } from "../state/AstState";
 
-export function parseObject(state: State): ObjectNode {
-  if (state.tokenType() !== TokenType.Delimeter || state.token() !== "{") {
+export function parseObject(state: AstState): ObjectNode {
+  if (!state.atDelimeter("{")) {
     throw new Error(`Expected '{'`);
   }
 
   state.nextToken();
 
-  if (state.tokenType() === TokenType.Delimeter && state.token() === "}") {
+  if (state.atDelimeter("}")) {
     // Immediately closed object
+    state.nextToken();
     return { type: "object", properties: [] };
   }
 
   const properties = parseProperties(state);
+
+  if (!state.atDelimeter("}")) {
+    throw new Error(`Unexpected token '${state.token()}'`);
+  }
+
+  state.nextToken();
+
   return { type: "object", properties };
 }

@@ -1,4 +1,4 @@
-import { TokenType } from "./token";
+import { TokenType } from "../token";
 
 const delimeters = new Set([":", ";", "{", "}", "[", "]", "<", ">"]);
 const whitespace = new Set([" ", "\t", "\n"]);
@@ -7,7 +7,7 @@ function isAlpha(c: string) {
   return /^[a-zA-Z]$/.test(c);
 }
 
-export class State {
+export class AstState {
   private index = 0;
   private _token: string = "";
   private _tokenType: TokenType = TokenType.None;

@@ -1,7 +1,7 @@
 import { enforceExhaustive } from "../../switch";
 import { ValueNode } from "../../types/Ast";
 import { parseObject } from "./object";
-import { State } from "../State";
+import { AstState } from "../state/AstState";
 import { TokenType } from "../token";
 
 const primitiveList = ["string", "number"] as const;
@@ -13,7 +13,7 @@ function isPrimitiveSymbol(s: string): s is PrimitiveSymbol {
   return primitives.has(s as PrimitiveSymbol);
 }
 
-export function parsePropertyValue(state: State): ValueNode {
+export function parseValue(state: AstState): ValueNode {
   let value: ValueNode;
 
   const tokenType = state.tokenType();
@@ -24,6 +24,7 @@ export function parsePropertyValue(state: State): ValueNode {
         throw new Error(`Unknown symbol '${token}'`);
       }
       value = { type: "primitive", valueType: token };
+      state.nextToken();
       break;
     }
     case TokenType.Delimeter: {
@@ -38,8 +39,6 @@ export function parsePropertyValue(state: State): ValueNode {
     default:
       enforceExhaustive(tokenType, `Unexpected token type`);
   }
-
-  state.nextToken();
 
   return value;
 }
