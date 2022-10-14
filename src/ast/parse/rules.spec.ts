@@ -22,14 +22,29 @@ describe("parseRule", () => {
   });
 
   it("moves to the next token after the rule", () => {
-    const state = new ParserState(`min(1), max(2)`);
-    const expectedRule: Rule = { type: "min", value: 1 };
+    // With parens
+    {
+      const state = new ParserState(`min(1), max(2)`);
+      const expectedRule: Rule = { type: "min", value: 1 };
 
-    const rule = parseRule(state, "number");
-    const nextToken = state.token();
+      const rule = parseRule(state, "number");
+      const nextToken = state.token();
 
-    expect(rule).toEqual(expectedRule);
-    expect(nextToken).toEqual(",");
+      expect(rule).toEqual(expectedRule);
+      expect(nextToken).toEqual(",");
+    }
+
+    // Without parens
+    {
+      const state = new ParserState(`int, positive`);
+      const expectedRule: Rule = { type: "int" };
+
+      const rule = parseRule(state, "number");
+      const nextToken = state.token();
+
+      expect(rule).toEqual(expectedRule);
+      expect(nextToken).toEqual(",");
+    }
   });
 
   it("throws an error if an argument is provided ", () => {
