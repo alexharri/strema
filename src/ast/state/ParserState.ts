@@ -7,6 +7,10 @@ function isAlpha(c: string) {
   return /^[a-zA-Z]$/.test(c);
 }
 
+function isNumeric(c: string) {
+  return /^[0-9]$/.test(c);
+}
+
 export class ParserState {
   private index = 0;
   private _token: string = "";
@@ -58,6 +62,11 @@ export class ParserState {
       return;
     }
 
+    if (isNumeric(c)) {
+      this.nextNumericToken(c);
+      return;
+    }
+
     if (isAlpha(c)) {
       this.nextSymbolToken(c);
       return;
@@ -78,6 +87,20 @@ export class ParserState {
       c = this.currentCharacter();
     }
     this._tokenType = TokenType.Symbol;
+    this._token = s;
+  }
+
+  /**
+   * @todo support decimals
+   */
+  private nextNumericToken(c: string) {
+    let s = "";
+    while (isNumeric(c)) {
+      s += c;
+      this.next();
+      c = this.currentCharacter();
+    }
+    this._tokenType = TokenType.Number;
     this._token = s;
   }
 
