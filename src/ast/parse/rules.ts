@@ -58,10 +58,6 @@ export function parseRule(
 
   const rule = resolveRule(primitiveType, ruleName, arg);
 
-  if (state.atDelimeter(",")) {
-    state.nextToken();
-  }
-
   return rule;
 }
 
@@ -78,6 +74,13 @@ export function parseRules(
 
   while (!state.atDelimeter(">")) {
     const rule = parseRule(state, primitiveType);
+
+    if (state.atDelimeter(",")) {
+      state.nextToken();
+    } else if (!state.atDelimeter(">")) {
+      throw new Error(`Expected ',' or '>', got '${state.token()}'`);
+    }
+
     rules.push(rule);
   }
   state.nextToken();

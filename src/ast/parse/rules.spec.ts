@@ -1,6 +1,6 @@
 import { Rule } from "../../types/Rule";
 import { ParserState } from "../state/ParserState";
-import { parseRule } from "./rules";
+import { parseRule, parseRules } from "./rules";
 
 describe("parseRule", () => {
   it("parses a single rule with no arguments", () => {
@@ -21,7 +21,7 @@ describe("parseRule", () => {
     expect(rule).toEqual(expectedRule);
   });
 
-  it("moves to the next rule to parse", () => {
+  it("moves to the next token after the rule", () => {
     const state = new ParserState(`min(1), max(2)`);
     const expectedRule: Rule = { type: "min", value: 1 };
 
@@ -29,24 +29,7 @@ describe("parseRule", () => {
     const nextToken = state.token();
 
     expect(rule).toEqual(expectedRule);
-    expect(nextToken).toEqual("max");
-  });
-
-  it("allows for trailing ',' at the end of the list of rules", () => {
-    const states = [
-      new ParserState(`min(1),\n>`),
-      new ParserState(`min(1),>`),
-      new ParserState(`min(1)>`),
-    ];
-    const expectedRule: Rule = { type: "min", value: 1 };
-
-    for (const state of states) {
-      const rule = parseRule(state, "number");
-      const nextToken = state.token();
-
-      expect(rule).toEqual(expectedRule);
-      expect(nextToken).toEqual(">");
-    }
+    expect(nextToken).toEqual(",");
   });
 
   it("throws an error if an argument is provided ", () => {
@@ -89,5 +72,33 @@ describe("parseRule", () => {
     expect(parse).toThrow(
       "Rule 'email' expects a string, you provided a number value"
     );
+  });
+});
+
+describe("parseRules", () => {
+  it("parses a single rule", () => {
+    const state = new ParserState(`<positive>`);
+    const expectedRules: Rule[] = [{ type: "positive" }];
+
+    const rules = parseRules(state, "number");
+
+    expect(rules).toEqual(expectedRules);
+  });
+
+  it("parses multiple rules", () => {
+    const state = new ParserState(`<positive, int>`);
+    const expectedRules: Rule[] = [{ type: "positive" }, { type: "int" }];
+
+    const rules = parseRules(state, "number");
+
+    expect(rules).toEqual(expectedRules);
+  });
+
+  it("throws if no closing '>' is provided", () => {
+    const state = new ParserState(`<positive, int;`);
+
+    const parse = () => parseRules(state, "number");
+
+    expect(parse).toThrow("Expected ',' or '>', got ';'");
   });
 });
