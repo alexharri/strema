@@ -13,6 +13,24 @@ function parseKey(state: ParserState): string {
   return state.token();
 }
 
+function parseIsArray(state: ParserState) {
+  let isArray: boolean;
+
+  if (state.atDelimeter("[")) {
+    state.nextToken();
+    if (!state.atDelimeter("]")) {
+      throw new Error(`Expected ']'`);
+    }
+    state.nextToken();
+
+    isArray = true;
+  } else {
+    isArray = false;
+  }
+
+  return isArray;
+}
+
 function parseProperty(state: ParserState): PropertyNode {
   const key = parseKey(state);
 
@@ -25,25 +43,15 @@ function parseProperty(state: ParserState): PropertyNode {
   state.nextToken();
 
   const value = parseValue(state);
-
-  let property: PropertyNode;
-
-  if (state.atDelimeter("[")) {
-    state.nextToken();
-    if (!state.atDelimeter("]")) {
-      throw new Error(`Expected ']'`);
-    }
-    property = {
-      type: "property",
-      key,
-      value: { type: "array", value },
-    };
-    state.nextToken();
-  } else {
-    property = { type: "property", key, value };
-  }
+  const isArray = parseIsArray(state);
 
   /** @todo check for rules */
+
+  const property: PropertyNode = { type: "property", key, value };
+
+  if (isArray) {
+    property.value = { type: "array", value: property.value };
+  }
 
   return property;
 }
