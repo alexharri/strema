@@ -1,8 +1,10 @@
 export interface PrimitiveNode {
   type: "primitive";
-  valueType: "string" | "number";
+  valueType: PrimitiveType;
   // Eventually, we will add rules here
 }
+
+export type PrimitiveType = "string" | "number";
 
 export interface PropertyNode {
   type: "property";

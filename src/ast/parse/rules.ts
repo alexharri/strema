@@ -1,4 +1,4 @@
-import { PrimitiveNode } from "../../types/Ast";
+import { PrimitiveType } from "../../types/Ast";
 import { Rule } from "../../types/Rule";
 import { ParserState } from "../state/ParserState";
 import { TokenType } from "../token";
@@ -15,19 +15,24 @@ function parseRuleArgument(state: ParserState): number | null {
   }
 
   const value = Number(state.token());
+  state.nextToken();
 
   if (!Number.isFinite(value)) {
     throw new Error(`Expected finite number, got '${value}'`);
   }
 
   if (!state.atDelimeter(")")) {
-    throw new Error(`Unexpected token '${state.token()}'`);
+    throw new Error(`Unexpected token '${state.token()}', expected ')'`);
   }
+  state.nextToken();
 
   return value;
 }
 
-function parseRule(state: ParserState, primitiveNode: PrimitiveNode): Rule {
+export function parseRule(
+  state: ParserState,
+  primitiveType: PrimitiveType
+): Rule {
   // Rules are comprised of a symbol, optionally followed by a single
   // argument within parenthesis (like a function call):
   //
@@ -43,13 +48,15 @@ function parseRule(state: ParserState, primitiveNode: PrimitiveNode): Rule {
   // After parsing a rule, skip over the comma ',' if present.
 
   if (state.tokenType() !== TokenType.Symbol) {
-    throw new Error(`Unexpected token '${state.token()}'`);
+    throw new Error(`Expected rule name, got '${state.token()}'`);
   }
 
   const ruleName = state.token();
+  state.nextToken();
+
   const arg = parseRuleArgument(state);
 
-  const rule = resolveRule(primitiveNode, ruleName, arg);
+  const rule = resolveRule(primitiveType, ruleName, arg);
 
   if (state.atDelimeter(",")) {
     state.nextToken();
@@ -60,7 +67,7 @@ function parseRule(state: ParserState, primitiveNode: PrimitiveNode): Rule {
 
 export function parseRules(
   state: ParserState,
-  primitiveNode: PrimitiveNode
+  primitiveType: PrimitiveType
 ): Rule[] {
   const rules: Rule[] = [];
 
@@ -70,7 +77,7 @@ export function parseRules(
   state.nextToken();
 
   while (!state.atDelimeter(">")) {
-    const rule = parseRule(state, primitiveNode);
+    const rule = parseRule(state, primitiveType);
     rules.push(rule);
   }
   state.nextToken();

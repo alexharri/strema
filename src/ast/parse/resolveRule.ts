@@ -1,14 +1,9 @@
-import { PrimitiveNode } from "../../types/Ast";
+import { PrimitiveType } from "../../types/Ast";
 import { Rule } from "../../types/rule";
-
-enum PrimitiveType {
-  String = "string",
-  Number = "number",
-}
 
 interface RuleTest {
   rule: Rule["type"];
-  valueType: PrimitiveType;
+  primitiveType: PrimitiveType;
   requiresNumericArgument: boolean;
   toRule: (arg: number | null) => Rule;
 }
@@ -16,31 +11,31 @@ interface RuleTest {
 const ruleTests: RuleTest[] = [
   {
     rule: "email",
-    valueType: PrimitiveType.String,
+    primitiveType: "string",
     requiresNumericArgument: false,
     toRule: () => ({ type: "email" }),
   },
   {
     rule: "positive",
-    valueType: PrimitiveType.Number,
+    primitiveType: "number",
     requiresNumericArgument: false,
     toRule: () => ({ type: "positive" }),
   },
   {
     rule: "integer",
-    valueType: PrimitiveType.Number,
+    primitiveType: "number",
     requiresNumericArgument: false,
     toRule: () => ({ type: "integer" }),
   },
   {
     rule: "min",
-    valueType: PrimitiveType.Number,
+    primitiveType: "number",
     requiresNumericArgument: true,
     toRule: (arg) => ({ type: "min", value: arg! }),
   },
   {
     rule: "max",
-    valueType: PrimitiveType.Number,
+    primitiveType: "number",
     requiresNumericArgument: true,
     toRule: (arg) => ({ type: "max", value: arg! }),
   },
@@ -52,11 +47,10 @@ const ruleTestsByName = ruleTests.reduce((obj, ruleTest) => {
 }, {} as Partial<Record<string, RuleTest>>);
 
 export function resolveRule(
-  primitiveNode: PrimitiveNode,
+  primitiveType: PrimitiveType,
   rule: string,
   arg: number | null
 ) {
-  const { valueType } = primitiveNode;
   const hasArg = arg !== null;
 
   const ruleTest = ruleTestsByName[rule];
@@ -65,10 +59,10 @@ export function resolveRule(
     throw new Error(`Unknown rule '${rule}'`);
   }
 
-  if (ruleTest.valueType !== valueType) {
+  if (ruleTest.primitiveType !== primitiveType) {
     throw new Error(
-      `Rule '${rule}' expects a ${ruleTest.valueType}, ` +
-        `you provided a ${valueType} value`
+      `Rule '${rule}' expects a ${ruleTest.primitiveType}, ` +
+        `you provided a ${primitiveType} value`
     );
   }
 

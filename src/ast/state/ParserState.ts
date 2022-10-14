@@ -1,6 +1,18 @@
 import { TokenType } from "../token";
 
-const delimeters = new Set([":", ";", "{", "}", "[", "]", "<", ">"]);
+const delimeters = new Set([
+  ":",
+  ";",
+  "{",
+  "}",
+  "[",
+  "]",
+  "<",
+  ">",
+  "(",
+  ")",
+  ",",
+]);
 const whitespace = new Set([" ", "\t", "\n"]);
 
 function isAlpha(c: string) {

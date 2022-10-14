@@ -16,7 +16,6 @@
     "src/**/*"
   ],
   "exclude": [
-    "src/**/*.spec.ts",
     "src/**/*.typecheck.ts",
   ]
 }
