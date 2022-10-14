@@ -1,5 +1,5 @@
 import { ValueNode } from "../../types/Ast";
-import { AstState } from "../state/AstState";
+import { ParserState } from "../state/ParserState";
 import { parseValue } from "./value";
 import { parseObject } from "./object";
 import { TokenType } from "../token";
@@ -13,9 +13,9 @@ jest.mock("./object", () => {
   };
 });
 
-describe("parsePropertyValue", () => {
+describe("parseValue", () => {
   it("parses a primitive value", () => {
-    const state = new AstState(`string;`);
+    const state = new ParserState(`string;`);
     const expectedValue: ValueNode = { type: "primitive", valueType: "string" };
 
     const value = parseValue(state);
@@ -26,7 +26,7 @@ describe("parsePropertyValue", () => {
   });
 
   it("does not consider arrays", () => {
-    const state = new AstState(`number[];`);
+    const state = new ParserState(`number[];`);
     const expectedValue: ValueNode = { type: "primitive", valueType: "number" };
 
     const value = parseValue(state);
@@ -37,7 +37,7 @@ describe("parsePropertyValue", () => {
   });
 
   it("parses objects by calling 'parseObject'", () => {
-    const state = new AstState(`{}`);
+    const state = new ParserState(`{}`);
     const expectedValue: ValueNode = { type: "object", properties: [] };
 
     const value = parseObject(state);
@@ -49,7 +49,7 @@ describe("parsePropertyValue", () => {
   });
 
   it("throws on unexpected symbols", () => {
-    const state = new AstState(`unknown;`);
+    const state = new ParserState(`unknown;`);
 
     const parse = () => parseValue(state);
 
@@ -65,7 +65,7 @@ describe("parsePropertyValue", () => {
     ];
 
     for (const { template, token } of cases) {
-      const state = new AstState(template);
+      const state = new ParserState(template);
 
       const parse = () => parseValue(state);
 
