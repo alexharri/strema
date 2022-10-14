@@ -49,6 +49,14 @@ describe("parseRule", () => {
     }
   });
 
+  it("throws an error if an argument is provided ", () => {
+    const state = new ParserState(`int(2)`);
+
+    const parse = () => parseRule(state, "number");
+
+    expect(parse).toThrow("Rule 'int' expects no arguments.");
+  });
+
   it("throws an error if multiple arguments are provided", () => {
     const state = new ParserState(`min(1, 2)`);
 
@@ -63,5 +71,23 @@ describe("parseRule", () => {
     const parse = () => parseRule(state, "number");
 
     expect(parse).toThrow("Expected rule name, got ','");
+  });
+
+  it("throws an error if an unknown rule name is provided", () => {
+    const state = new ParserState(`emial`);
+
+    const parse = () => parseRule(state, "string");
+
+    expect(parse).toThrow("Unknown rule 'emial'");
+  });
+
+  it("throws an error if the primitive type does not match", () => {
+    const state = new ParserState(`email`);
+
+    const parse = () => parseRule(state, "number");
+
+    expect(parse).toThrow(
+      "Rule 'email' expects a string, you provided a number value"
+    );
   });
 });

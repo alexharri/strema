@@ -22,10 +22,10 @@ const ruleTests: RuleTest[] = [
     toRule: () => ({ type: "positive" }),
   },
   {
-    rule: "integer",
+    rule: "int",
     primitiveType: "number",
     requiresNumericArgument: false,
-    toRule: () => ({ type: "integer" }),
+    toRule: () => ({ type: "int" }),
   },
   {
     rule: "min",

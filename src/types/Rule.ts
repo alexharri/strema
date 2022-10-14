@@ -1,7 +1,7 @@
 export type StringRule = { type: "email" };
 
 export type NumberRule =
-  | { type: "integer" }
+  | { type: "int" }
   | { type: "positive" }
   | { type: "min"; value: number }
   | { type: "max"; value: number };
