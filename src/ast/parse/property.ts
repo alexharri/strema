@@ -1,6 +1,7 @@
 import { PropertyNode } from "../../types/Ast";
 import { ParserState } from "../state/ParserState";
 import { TokenType } from "../token";
+import { parseRules } from "./rules";
 import { parseValue } from "./value";
 
 function parseKey(state: ParserState): string {
@@ -45,7 +46,9 @@ function parseProperty(state: ParserState): PropertyNode {
   const value = parseValue(state);
   const isArray = parseIsArray(state);
 
-  /** @todo check for rules */
+  if (value.type === "primitive") {
+    value.rules = parseRules(state, value.valueType);
+  }
 
   const property: PropertyNode = { type: "property", key, value };
 

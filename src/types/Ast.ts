@@ -1,7 +1,9 @@
+import { Rule } from "./Rule";
+
 export interface PrimitiveNode {
   type: "primitive";
   valueType: PrimitiveType;
-  // Eventually, we will add rules here
+  rules: Rule[];
 }
 
 export type PrimitiveType = "string" | "number";
