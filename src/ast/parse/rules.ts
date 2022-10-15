@@ -1,4 +1,4 @@
-import { PrimitiveType } from "../../types/Ast";
+import { Primitive } from "../../types/Primitive";
 import { Rule } from "../../types/Rule";
 import { ParserState } from "../state/ParserState";
 import { TokenType } from "../token";
@@ -29,10 +29,7 @@ function parseRuleArgument(state: ParserState): number | null {
   return value;
 }
 
-export function parseRule(
-  state: ParserState,
-  primitiveType: PrimitiveType
-): Rule {
+export function parseRule(state: ParserState, primitiveType: Primitive): Rule {
   // Rules are comprised of a symbol, optionally followed by a single
   // argument within parenthesis (like a function call):
   //
@@ -63,7 +60,7 @@ export function parseRule(
 
 export function parseRules(
   state: ParserState,
-  primitiveType: PrimitiveType
+  primitiveType: Primitive
 ): Rule[] {
   const rules: Rule[] = [];
 
