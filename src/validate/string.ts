@@ -1,6 +1,7 @@
 import { typeAsString } from "../format/typeAsString";
 import { StringRule } from "../types/Rule";
 import { ValidationContext } from "../types/ValidationContext";
+import { validateStringRule } from "./rules/string";
 import { ValidationError } from "./ValidationError";
 
 export function validateString(
@@ -22,7 +23,12 @@ export function validateString(
     });
   }
 
-  /** @todo perform rule checks */
+  for (const rule of rules) {
+    const err = validateStringRule(ctx, value, rule);
+    if (err) {
+      return err;
+    }
+  }
 
   return null;
 }
