@@ -47,7 +47,7 @@ it("ignores rules in '<>' for primitives", () => [
       a: CompileError<
         [
           "Failed to parse value of property 'a'",
-          "Expected one of [string, number] but got 'string[]abcd'"
+          "Expected one of [string, number, boolean] but got 'string[]abcd'"
         ]
       >;
     }
@@ -82,7 +82,7 @@ it("parses multiple object properties", () => [
 it("errors when an invalid symbol is provided for a property value", () => {
   type Err = [
     "Failed to parse value of property 'a'",
-    "Expected one of [string, number] but got 'notvalid'"
+    "Expected one of [string, number, boolean] but got 'notvalid'"
   ];
 
   return [eq<Parse<`{ a: notvalid }`>, { a: CompileError<Err> }>()];

@@ -1,9 +1,9 @@
-import { PrimitiveType } from "../../types/Ast";
+import { Primitive } from "../../types/Primitive";
 import { Rule, RuleType } from "../../types/Rule";
 
 interface RuleTest {
   rule: RuleType;
-  primitiveType: PrimitiveType;
+  primitiveType: Primitive;
   requiresNumericArgument: boolean;
   toRule: (arg: number | null) => Rule;
 }
@@ -47,7 +47,7 @@ const ruleTestsByName = ruleTests.reduce((obj, ruleTest) => {
 }, {} as Partial<Record<string, RuleTest>>);
 
 export function resolveRule(
-  primitiveType: PrimitiveType,
+  primitiveType: Primitive,
   rule: string,
   arg: number | null
 ) {
