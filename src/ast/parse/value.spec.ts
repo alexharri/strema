@@ -1,8 +1,14 @@
-import { ValueNode } from "../../types/Ast";
+import { PrimitiveNode, PrimitiveType, ValueNode } from "../../types/Ast";
 import { ParserState } from "../state/ParserState";
 import { parseValue } from "./value";
 import { parseObject } from "./object";
 import { TokenType } from "../token";
+
+const primitiveNode = (valueType: PrimitiveType): PrimitiveNode => ({
+  type: "primitive",
+  valueType,
+  rules: [], // Rules are not parsed by 'parseValue'
+});
 
 jest.mock("./object", () => {
   const originalModule = jest.requireActual("./object");
@@ -16,7 +22,7 @@ jest.mock("./object", () => {
 describe("parseValue", () => {
   it("parses a primitive value", () => {
     const state = new ParserState(`string;`);
-    const expectedValue: ValueNode = { type: "primitive", valueType: "string" };
+    const expectedValue: ValueNode = primitiveNode("string");
 
     const value = parseValue(state);
     const nextToken = state.token();
@@ -27,7 +33,7 @@ describe("parseValue", () => {
 
   it("does not consider arrays", () => {
     const state = new ParserState(`number[];`);
-    const expectedValue: ValueNode = { type: "primitive", valueType: "number" };
+    const expectedValue: ValueNode = primitiveNode("number");
 
     const value = parseValue(state);
     const nextToken = state.token();

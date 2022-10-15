@@ -17,7 +17,7 @@ describe("astFromString", () => {
         {
           type: "property",
           key: "a",
-          value: { type: "primitive", valueType: "string" },
+          value: { type: "primitive", valueType: "string", rules: [] },
         },
       ],
     };
@@ -33,12 +33,12 @@ describe("astFromString", () => {
         {
           type: "property",
           key: "a",
-          value: { type: "primitive", valueType: "string" },
+          value: { type: "primitive", valueType: "string", rules: [] },
         },
         {
           type: "property",
           key: "b",
-          value: { type: "primitive", valueType: "number" },
+          value: { type: "primitive", valueType: "number", rules: [] },
         },
       ],
     };
@@ -67,7 +67,7 @@ describe("astFromString", () => {
               {
                 type: "property",
                 key: "b",
-                value: { type: "primitive", valueType: "string" },
+                value: { type: "primitive", valueType: "string", rules: [] },
               },
             ],
           },
@@ -98,7 +98,11 @@ describe("astFromString", () => {
                     {
                       type: "property",
                       key: "c",
-                      value: { type: "primitive", valueType: "string" },
+                      value: {
+                        type: "primitive",
+                        valueType: "string",
+                        rules: [],
+                      },
                     },
                   ],
                 },
@@ -122,7 +126,7 @@ describe("astFromString", () => {
           key: "a",
           value: {
             type: "array",
-            value: { type: "primitive", valueType: "string" },
+            value: { type: "primitive", valueType: "string", rules: [] },
           },
         },
       ],
@@ -147,7 +151,7 @@ describe("astFromString", () => {
                 {
                   type: "property",
                   key: "b",
-                  value: { type: "primitive", valueType: "string" },
+                  value: { type: "primitive", valueType: "string", rules: [] },
                 },
               ],
             },

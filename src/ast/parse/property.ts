@@ -32,7 +32,7 @@ function parseIsArray(state: ParserState) {
   return isArray;
 }
 
-function parseProperty(state: ParserState): PropertyNode {
+export function parseProperty(state: ParserState): PropertyNode {
   const key = parseKey(state);
 
   state.nextToken();
