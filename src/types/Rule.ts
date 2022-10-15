@@ -7,3 +7,5 @@ export type NumberRule =
   | { type: "max"; value: number };
 
 export type Rule = StringRule | NumberRule;
+
+export type RuleType = Rule["type"];

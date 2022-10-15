@@ -1,8 +1,8 @@
 import { PrimitiveType } from "../../types/Ast";
-import { Rule } from "../../types/rule";
+import { Rule, RuleType } from "../../types/rule";
 
 interface RuleTest {
-  rule: Rule["type"];
+  rule: RuleType;
   primitiveType: PrimitiveType;
   requiresNumericArgument: boolean;
   toRule: (arg: number | null) => Rule;
