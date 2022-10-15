@@ -1,5 +1,4 @@
 import { ObjectNode, PrimitiveNode } from "../../types/Ast";
-import { Rule } from "../../types/Rule";
 import { ParserState } from "../state/ParserState";
 import { parseProperty } from "./property";
 
@@ -15,13 +14,13 @@ describe("parseProperty", () => {
     expect(value.valueType).toEqual("string");
   });
 
-  it("parses rules for a primitive property", () => {
+  it("parses a single rule for a primitive property", () => {
     const state = new ParserState(`a: string <email>`);
-    const expectedRules: Rule[] = [{ type: "email" }];
 
     const value = parseProperty(state).value as PrimitiveNode;
 
-    expect(value.rules).toEqual(expectedRules);
+    expect(value.rules.length).toEqual(1);
+    expect(value.rules[0].type).toEqual("email");
   });
 
   it("parses a list of rules for a primitive property", () => {
