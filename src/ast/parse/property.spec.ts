@@ -1,4 +1,4 @@
-import { ObjectNode, PrimitiveNode } from "../../types/Ast";
+import { ArrayNode, ObjectNode, PrimitiveNode } from "../../types/Ast";
 import { ParserState } from "../state/ParserState";
 import { parseProperty } from "./property";
 
@@ -45,5 +45,32 @@ describe("parseProperty", () => {
     const value = parseProperty(state).value as ObjectNode;
 
     expect(value.properties.length).toEqual(2);
+  });
+
+  it("parses an array of primitives or objects", () => {
+    const templates = [
+      { template: `a: string[]`, type: "primitive" },
+      { template: `a: {}[]`, type: "object" },
+    ];
+
+    for (const { template, type } of templates) {
+      const state = new ParserState(template);
+
+      const property = parseProperty(state);
+      const value = property.value as ArrayNode;
+
+      expect(property.key).toEqual("a");
+      expect(value.type).toEqual("array");
+      expect(value.value.type).toEqual(type);
+    }
+  });
+
+  it("parses the rules for an array of primitives", () => {
+    const state = new ParserState(`emails: string[] <email>`);
+
+    const value = parseProperty(state).value as ArrayNode;
+    const primitive = value.value as PrimitiveNode;
+
+    expect(primitive.rules.length).toEqual(1);
   });
 });
