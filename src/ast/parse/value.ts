@@ -3,8 +3,9 @@ import { ValueNode } from "../../types/Ast";
 import { parseObject } from "./object";
 import { ParserState } from "../state/ParserState";
 import { TokenType } from "../token";
+import { PrimitivesTuple } from "../../types/Primitive";
 
-const primitiveList = ["string", "number", "boolean"] as const;
+const primitiveList: PrimitivesTuple = ["string", "number", "boolean"];
 const primitives = new Set(primitiveList);
 
 type PrimitiveSymbol = typeof primitiveList[number];

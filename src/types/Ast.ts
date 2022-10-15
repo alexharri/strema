@@ -1,12 +1,11 @@
+import { Primitive } from "./Primitive";
 import { Rule } from "./Rule";
 
 export interface PrimitiveNode {
   type: "primitive";
-  valueType: PrimitiveType;
+  valueType: Primitive;
   rules: Rule[];
 }
-
-export type PrimitiveType = "string" | "number" | "boolean";
 
 export interface PropertyNode {
   type: "property";

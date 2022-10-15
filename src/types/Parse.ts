@@ -1,4 +1,5 @@
 import { CompileError as Err } from "./CompileError";
+import { Primitive, PrimitivesTuple } from "./Primitive";
 import { Resolve } from "./Resolve";
 import { SplitIntoProperties } from "./SplitIntoProperties";
 import { StringJoin } from "./StringJoin";
@@ -9,17 +10,17 @@ type MergeArrayIntoObject<T extends unknown[]> = T extends [infer R, ...infer U]
   ? R & MergeArrayIntoObject<U>
   : {};
 
-type Tokens = ["string", "number"];
-type Token = Tokens[number];
-
 type TokenToValue = {
   string: string;
   number: number;
+  boolean: boolean;
 };
 
-type ParseToken<T extends string> = T extends Token
+type ParseToken<T extends string> = T extends Primitive
   ? TokenToValue[T]
-  : Err<[`Expected one of [${StringJoin<Tokens, ", ">}] but got '${T}'`]>;
+  : Err<
+      [`Expected one of [${StringJoin<PrimitivesTuple, ", ">}] but got '${T}'`]
+    >;
 
 type FindValue<T extends string> =
   // Array of objects
