@@ -10,7 +10,11 @@ function validateInt(
   if (Number.isInteger(value)) {
     return null;
   }
-  return new ValidationError({ message: "Number is not integer", ctx, value });
+  return new ValidationError({
+    message: "Number is not an integer",
+    ctx,
+    value,
+  });
 }
 
 function validatePositive(
