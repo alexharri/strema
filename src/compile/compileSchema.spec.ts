@@ -41,7 +41,7 @@ describe("compileSchema", () => {
     try {
       schema.parseSync({ a: "string" });
     } catch (e) {
-      thrown = e;
+      thrown = e as ValidationError;
     }
 
     expect(thrown.message).toEqual("Expected number value, got string");
@@ -54,7 +54,7 @@ describe("compileSchema", () => {
     try {
       schema.parseSync({ a: { b: [0, 1, "2"] } });
     } catch (e) {
-      thrown = e;
+      thrown = e as ValidationError;
     }
 
     expect(thrown.path).toEqual("a.b[2]");
@@ -67,7 +67,7 @@ describe("compileSchema", () => {
     try {
       schema.parseSync({ a: { b: [0, 1, "2"] } });
     } catch (e) {
-      thrown = e;
+      thrown = e as ValidationError;
     }
 
     expect(thrown.value).toEqual("2");
@@ -80,7 +80,7 @@ describe("compileSchema", () => {
     try {
       schema.parseSync({ a: "string" });
     } catch (e) {
-      thrown = e;
+      thrown = e as ValidationError;
     }
 
     expect(thrown instanceof ValidationError).toEqual(true);

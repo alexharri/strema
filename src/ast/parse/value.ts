@@ -23,7 +23,11 @@ export function parseValue(state: ParserState): ValueNode {
       if (!isPrimitiveSymbol(token)) {
         throw new Error(`Unknown symbol '${token}'`);
       }
-      value = { type: "primitive", valueType: token };
+      value = {
+        type: "primitive",
+        valueType: token,
+        rules: [], // The rules are added later in 'parseProperty'
+      };
       state.nextToken();
       break;
     }
@@ -36,6 +40,8 @@ export function parseValue(state: ParserState): ValueNode {
     }
     case TokenType.None:
       throw new Error(`Expected end of template`);
+    case TokenType.Number:
+      throw new Error(`Unexpected token type '${tokenType}'`);
     default:
       enforceExhaustive(tokenType, `Unexpected token type`);
   }

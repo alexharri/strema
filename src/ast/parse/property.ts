@@ -1,6 +1,7 @@
 import { PropertyNode } from "../../types/Ast";
 import { ParserState } from "../state/ParserState";
 import { TokenType } from "../token";
+import { parseRules } from "./rules";
 import { parseValue } from "./value";
 
 function parseKey(state: ParserState): string {
@@ -13,7 +14,25 @@ function parseKey(state: ParserState): string {
   return state.token();
 }
 
-function parseProperty(state: ParserState): PropertyNode {
+function parseIsArray(state: ParserState) {
+  let isArray: boolean;
+
+  if (state.atDelimeter("[")) {
+    state.nextToken();
+    if (!state.atDelimeter("]")) {
+      throw new Error(`Expected ']'`);
+    }
+    state.nextToken();
+
+    isArray = true;
+  } else {
+    isArray = false;
+  }
+
+  return isArray;
+}
+
+export function parseProperty(state: ParserState): PropertyNode {
   const key = parseKey(state);
 
   state.nextToken();
@@ -25,25 +44,17 @@ function parseProperty(state: ParserState): PropertyNode {
   state.nextToken();
 
   const value = parseValue(state);
+  const isArray = parseIsArray(state);
 
-  let property: PropertyNode;
-
-  if (state.atDelimeter("[")) {
-    state.nextToken();
-    if (!state.atDelimeter("]")) {
-      throw new Error(`Expected ']'`);
-    }
-    property = {
-      type: "property",
-      key,
-      value: { type: "array", value },
-    };
-    state.nextToken();
-  } else {
-    property = { type: "property", key, value };
+  if (value.type === "primitive") {
+    value.rules = parseRules(state, value.valueType);
   }
 
-  /** @todo check for rules */
+  const property: PropertyNode = { type: "property", key, value };
+
+  if (isArray) {
+    property.value = { type: "array", value: property.value };
+  }
 
   return property;
 }
