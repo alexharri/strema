@@ -47,22 +47,26 @@ describe("parseProperty", () => {
     expect(value.properties.length).toEqual(2);
   });
 
-  it("parses an array of primitives or objects", () => {
-    const templates = [
-      { template: `a: string[]`, type: "primitive" },
-      { template: `a: {}[]`, type: "object" },
-    ];
+  it("parses an array of primitives", () => {
+    const state = new ParserState(`strArr: string[]`);
 
-    for (const { template, type } of templates) {
-      const state = new ParserState(template);
+    const property = parseProperty(state);
+    const value = property.value as ArrayNode;
 
-      const property = parseProperty(state);
-      const value = property.value as ArrayNode;
+    expect(property.key).toEqual("strArr");
+    expect(value.type).toEqual("array");
+    expect(value.value.type).toEqual("primitive");
+  });
 
-      expect(property.key).toEqual("a");
-      expect(value.type).toEqual("array");
-      expect(value.value.type).toEqual(type);
-    }
+  it("parses an array of objects", () => {
+    const state = new ParserState(`objArr: {}[]`);
+
+    const property = parseProperty(state);
+    const value = property.value as ArrayNode;
+
+    expect(property.key).toEqual("objArr");
+    expect(value.type).toEqual("array");
+    expect(value.value.type).toEqual("object");
   });
 
   it("parses the rules for an array of primitives", () => {
