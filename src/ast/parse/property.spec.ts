@@ -1,6 +1,6 @@
 import { ArrayNode, ObjectNode, PrimitiveNode } from "../../types/Ast";
 import { ParserState } from "../state/ParserState";
-import { parseProperty } from "./property";
+import { parseProperties, parseProperty } from "./property";
 
 describe("parseProperty", () => {
   it("parses the key and value of a primitive property", () => {
@@ -72,5 +72,54 @@ describe("parseProperty", () => {
     const primitive = value.value as PrimitiveNode;
 
     expect(primitive.rules.length).toEqual(1);
+  });
+});
+
+describe("parseProperties", () => {
+  // An object is opened with the '{' token, so a closing '}' is expected after
+  // parsing the object's properties.
+  //
+  // 'parseProperties' is called after processing the opening '{'.
+  it("throws if a closing '}' is not present", () => {
+    const state = new ParserState(`a: string <email>;`);
+
+    const parse = () => parseProperties(state);
+
+    expect(parse).toThrow("Unexpected end of template");
+  });
+
+  it("does not process the closing '}'", () => {
+    const state = new ParserState(`a: string <email>; } <`);
+
+    parseProperties(state);
+
+    expect(state.token()).toEqual("}");
+    expect(state.token()).not.toEqual("<");
+  });
+
+  it("parses a single property", () => {
+    const state = new ParserState(`a: string <email>; }`);
+
+    const properties = parseProperties(state);
+
+    expect(properties.length).toEqual(1);
+  });
+
+  it("parses multiple properties", () => {
+    const state = new ParserState(
+      `a: string <email>; c: { d: string[] }; b: number[] <int>; }`
+    );
+
+    const properties = parseProperties(state);
+
+    expect(properties.length).toEqual(3);
+  });
+
+  it("does not parse rules for object properties", () => {
+    const state = new ParserState(`a: { b: number; } <rule> }`);
+
+    const parse = () => parseProperties(state);
+
+    expect(parse).toThrow("Unexpected token '<'");
   });
 });
