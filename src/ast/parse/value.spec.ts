@@ -1,14 +1,7 @@
-import { PrimitiveNode, PrimitiveType, ValueNode } from "../../types/Ast";
+import { PrimitiveNode, ValueNode } from "../../types/Ast";
 import { ParserState } from "../state/ParserState";
 import { parseValue } from "./value";
 import { parseObject } from "./object";
-import { TokenType } from "../token";
-
-const primitiveNode = (valueType: PrimitiveType): PrimitiveNode => ({
-  type: "primitive",
-  valueType,
-  rules: [], // Rules are not parsed by 'parseValue'
-});
 
 jest.mock("./object", () => {
   const originalModule = jest.requireActual("./object");
@@ -22,24 +15,37 @@ jest.mock("./object", () => {
 describe("parseValue", () => {
   it("parses a primitive value", () => {
     const state = new ParserState(`string;`);
-    const expectedValue: ValueNode = primitiveNode("string");
 
-    const value = parseValue(state);
-    const nextToken = state.token();
+    const value = parseValue(state) as PrimitiveNode;
 
-    expect(value).toEqual(expectedValue);
-    expect(nextToken).toEqual(";");
+    expect(value.type).toEqual("primitive");
+    expect(value.valueType).toEqual("string");
   });
 
-  it("does not consider arrays", () => {
+  it("moves to the next token after the property", () => {
+    const state = new ParserState(`string;`);
+
+    parseValue(state);
+
+    expect(state.token()).toEqual(";");
+  });
+
+  it("does not consider array notation after the primitive", () => {
     const state = new ParserState(`number[];`);
-    const expectedValue: ValueNode = primitiveNode("number");
 
-    const value = parseValue(state);
-    const nextToken = state.token();
+    const value = parseValue(state) as PrimitiveNode;
 
-    expect(value).toEqual(expectedValue);
-    expect(nextToken).toEqual("[");
+    expect(value.type).toEqual("primitive");
+    expect(state.token()).toEqual("[");
+  });
+
+  it("does not consider rules after the primitive", () => {
+    const state = new ParserState(`number <positive>;`);
+
+    const value = parseValue(state) as PrimitiveNode;
+
+    expect(value.rules.length).toEqual(0);
+    expect(state.token()).toEqual("<");
   });
 
   it("parses objects by calling 'parseObject'", () => {
@@ -47,11 +53,9 @@ describe("parseValue", () => {
     const expectedValue: ValueNode = { type: "object", properties: [] };
 
     const value = parseObject(state);
-    const nextTokenType = state.tokenType();
 
     expect(parseObject).toBeCalledTimes(1);
     expect(value).toEqual(expectedValue);
-    expect(nextTokenType).toEqual(TokenType.None);
   });
 
   it("throws on unexpected symbols", () => {
