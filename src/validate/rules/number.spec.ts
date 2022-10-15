@@ -37,7 +37,7 @@ describe("validateNumberRule", () => {
   it("enforces the 'min' rule", () => {
     const parse = createParseFunction(`<min(5)>`);
 
-    const fiveOrHigher = [5, 10, Number.MAX_SAFE_INTEGER, 5.5];
+    const fiveOrHigher = [5, 10, Number.MAX_VALUE, 5.5];
     const lowerThanFive = [0, -5, 4.999999999999998, 1];
 
     for (const value of fiveOrHigher) {
@@ -45,6 +45,20 @@ describe("validateNumberRule", () => {
     }
     for (const value of lowerThanFive) {
       expect(parse(value)).toThrow("Number is lower than '5'");
+    }
+  });
+
+  it("enforces the 'max' rule", () => {
+    const parse = createParseFunction(`<max(5)>`);
+
+    const fiveOrLower = [5, 0, -5, Number.MIN_VALUE];
+    const higherThanFive = [5.000000001, 10, Number.MAX_VALUE, 5.5];
+
+    for (const value of fiveOrLower) {
+      expect(parse(value)).not.toThrow();
+    }
+    for (const value of higherThanFive) {
+      expect(parse(value)).toThrow("Number is higher than '5'");
     }
   });
 });
