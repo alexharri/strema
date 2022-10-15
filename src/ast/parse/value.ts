@@ -4,7 +4,7 @@ import { parseObject } from "./object";
 import { ParserState } from "../state/ParserState";
 import { TokenType } from "../token";
 
-const primitiveList = ["string", "number"] as const;
+const primitiveList = ["string", "number", "boolean"] as const;
 const primitives = new Set(primitiveList);
 
 type PrimitiveSymbol = typeof primitiveList[number];

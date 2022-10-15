@@ -6,7 +6,7 @@ export interface PrimitiveNode {
   rules: Rule[];
 }
 
-export type PrimitiveType = "string" | "number";
+export type PrimitiveType = "string" | "number" | "boolean";
 
 export interface PropertyNode {
   type: "property";
