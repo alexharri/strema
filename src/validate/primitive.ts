@@ -14,13 +14,11 @@ export function validatePrimitive(
   const { valueType } = spec;
   switch (valueType) {
     case "string": {
-      /** @todo read rules from spec */
-      const rules: StringRule[] = [];
+      const rules = spec.rules as StringRule[];
       return validateString(value, rules, ctx);
     }
     case "number": {
-      /** @todo read rules from spec */
-      const rules: NumberRule[] = [];
+      const rules = spec.rules as NumberRule[];
       return validateNumber(value, rules, ctx);
     }
     default:
