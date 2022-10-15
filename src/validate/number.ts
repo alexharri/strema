@@ -1,6 +1,7 @@
 import { typeAsString } from "../format/typeAsString";
 import { NumberRule } from "../types/Rule";
 import { ValidationContext } from "../types/ValidationContext";
+import { validateNumberRule } from "./rules/number";
 import { ValidationError } from "./ValidationError";
 
 export function validateNumber(
@@ -30,7 +31,12 @@ export function validateNumber(
     });
   }
 
-  /** @todo perform rule checks */
+  for (const rule of rules) {
+    const err = validateNumberRule(ctx, value, rule);
+    if (err) {
+      return err;
+    }
+  }
 
   return null;
 }
