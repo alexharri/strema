@@ -1,5 +1,5 @@
 import { PrimitiveType } from "../../types/Ast";
-import { Rule, RuleType } from "../../types/rule";
+import { Rule, RuleType } from "../../types/Rule";
 
 interface RuleTest {
   rule: RuleType;
