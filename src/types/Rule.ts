@@ -1,10 +1,17 @@
-export type StringRule = { type: "email" };
+export type StringEmailRule = { type: "email" };
+
+export type StringRule = StringEmailRule;
+
+export type NumberIntRule = { type: "int" };
+export type NumberPositiveRule = { type: "positive" };
+export type NumberMaxRule = { type: "max"; value: number };
+export type NumberMinRule = { type: "min"; value: number };
 
 export type NumberRule =
-  | { type: "int" }
-  | { type: "positive" }
-  | { type: "min"; value: number }
-  | { type: "max"; value: number };
+  | NumberIntRule
+  | NumberPositiveRule
+  | NumberMinRule
+  | NumberMaxRule;
 
 export type Rule = StringRule | NumberRule;
 

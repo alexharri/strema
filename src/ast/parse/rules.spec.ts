@@ -1,49 +1,42 @@
-import { Rule } from "../../types/Rule";
+import { NumberMinRule } from "../../types/Rule";
 import { ParserState } from "../state/ParserState";
 import { parseRule, parseRules } from "./rules";
 
 describe("parseRule", () => {
   it("parses a single rule with no arguments", () => {
     const state = new ParserState(`positive`);
-    const expectedRule: Rule = { type: "positive" };
 
     const rule = parseRule(state, "number");
 
-    expect(rule).toEqual(expectedRule);
+    expect(rule.type).toEqual("positive");
   });
 
   it("parses a single rule with an arguments", () => {
     const state = new ParserState(`min(5)`);
-    const expectedRule: Rule = { type: "min", value: 5 };
 
-    const rule = parseRule(state, "number");
+    const rule = parseRule(state, "number") as NumberMinRule;
 
-    expect(rule).toEqual(expectedRule);
+    expect(rule.type).toEqual("min");
+    expect(rule.value).toEqual(5);
   });
 
   it("moves to the next token after the rule", () => {
-    // With parens
     {
+      // With parens
       const state = new ParserState(`min(1), max(2)`);
-      const expectedRule: Rule = { type: "min", value: 1 };
 
-      const rule = parseRule(state, "number");
-      const nextToken = state.token();
+      parseRule(state, "number");
 
-      expect(rule).toEqual(expectedRule);
-      expect(nextToken).toEqual(",");
+      expect(state.token()).toEqual(",");
     }
 
-    // Without parens
     {
+      // Without parens
       const state = new ParserState(`int, positive`);
-      const expectedRule: Rule = { type: "int" };
 
-      const rule = parseRule(state, "number");
-      const nextToken = state.token();
+      parseRule(state, "number");
 
-      expect(rule).toEqual(expectedRule);
-      expect(nextToken).toEqual(",");
+      expect(state.token()).toEqual(",");
     }
   });
 
@@ -93,20 +86,18 @@ describe("parseRule", () => {
 describe("parseRules", () => {
   it("parses a single rule", () => {
     const state = new ParserState(`<positive>`);
-    const expectedRules: Rule[] = [{ type: "positive" }];
 
     const rules = parseRules(state, "number");
 
-    expect(rules).toEqual(expectedRules);
+    expect(rules.length).toEqual(1);
   });
 
   it("parses multiple rules", () => {
-    const state = new ParserState(`<positive, int>`);
-    const expectedRules: Rule[] = [{ type: "positive" }, { type: "int" }];
+    const state = new ParserState(`<max(10), int, min(5)>`);
 
     const rules = parseRules(state, "number");
 
-    expect(rules).toEqual(expectedRules);
+    expect(rules.length).toEqual(3);
   });
 
   it("throws if no closing '>' is provided", () => {
