@@ -3,6 +3,14 @@ import { Primitive } from "../../types/Primitive";
 import { ParserState } from "../state/ParserState";
 import { TokenType } from "../token";
 
+// So that the error message prints quotes around the value (like '"..."')
+function quoteIfString(token: string, tokenType: TokenType) {
+  if (tokenType === TokenType.String) {
+    token = `"${token}"`;
+  }
+  return token;
+}
+
 function parseString(token: string, tokenType: TokenType) {
   if (tokenType !== TokenType.String) {
     throw new Error(`Expected string, got '${token}'`);
@@ -13,7 +21,9 @@ function parseString(token: string, tokenType: TokenType) {
 
 function parseNumber(token: string, tokenType: TokenType) {
   if (tokenType !== TokenType.Number) {
-    throw new Error(`Expected number, got '${token}'`);
+    throw new Error(
+      `Expected number, got '${quoteIfString(token, tokenType)}'`
+    );
   }
 
   const value = Number(token);
@@ -27,7 +37,9 @@ function parseNumber(token: string, tokenType: TokenType) {
 
 function parseBoolean(token: string, tokenType: TokenType) {
   if (tokenType !== TokenType.Symbol) {
-    throw new Error(`Expected boolean, got '${token}'`);
+    throw new Error(
+      `Expected boolean, got '${quoteIfString(token, tokenType)}'`
+    );
   }
 
   switch (token) {
