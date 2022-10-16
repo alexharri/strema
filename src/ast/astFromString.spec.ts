@@ -17,7 +17,12 @@ describe("astFromString", () => {
         {
           type: "property",
           key: "a",
-          value: { type: "primitive", valueType: "string", rules: [] },
+          value: {
+            type: "primitive",
+            valueType: "string",
+            rules: [],
+            defaultValue: null,
+          },
         },
       ],
     };
@@ -33,12 +38,22 @@ describe("astFromString", () => {
         {
           type: "property",
           key: "a",
-          value: { type: "primitive", valueType: "string", rules: [] },
+          value: {
+            type: "primitive",
+            valueType: "string",
+            rules: [],
+            defaultValue: null,
+          },
         },
         {
           type: "property",
           key: "b",
-          value: { type: "primitive", valueType: "number", rules: [] },
+          value: {
+            type: "primitive",
+            valueType: "number",
+            rules: [],
+            defaultValue: null,
+          },
         },
       ],
     };
@@ -67,7 +82,12 @@ describe("astFromString", () => {
               {
                 type: "property",
                 key: "b",
-                value: { type: "primitive", valueType: "string", rules: [] },
+                value: {
+                  type: "primitive",
+                  valueType: "string",
+                  rules: [],
+                  defaultValue: null,
+                },
               },
             ],
           },
@@ -102,6 +122,7 @@ describe("astFromString", () => {
                         type: "primitive",
                         valueType: "string",
                         rules: [],
+                        defaultValue: null,
                       },
                     },
                   ],
@@ -126,7 +147,12 @@ describe("astFromString", () => {
           key: "a",
           value: {
             type: "array",
-            value: { type: "primitive", valueType: "string", rules: [] },
+            value: {
+              type: "primitive",
+              valueType: "string",
+              rules: [],
+              defaultValue: null,
+            },
           },
         },
       ],
@@ -151,7 +177,12 @@ describe("astFromString", () => {
                 {
                   type: "property",
                   key: "b",
-                  value: { type: "primitive", valueType: "string", rules: [] },
+                  value: {
+                    type: "primitive",
+                    valueType: "string",
+                    rules: [],
+                    defaultValue: null,
+                  },
                 },
               ],
             },
