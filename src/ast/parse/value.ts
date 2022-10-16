@@ -43,6 +43,7 @@ export function parseValue(state: ParserState): ValueNode {
     case TokenType.None:
       throw new Error(`Expected end of template`);
     case TokenType.Number:
+    case TokenType.String:
       throw new Error(`Unexpected token type '${tokenType}'`);
     default:
       enforceExhaustive(tokenType, `Unexpected token type`);
