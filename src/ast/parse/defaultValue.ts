@@ -5,7 +5,7 @@ import { TokenType } from "../token";
 
 function parseString(token: string, tokenType: TokenType) {
   if (tokenType !== TokenType.String) {
-    throw new Error(`Expected string, got ${tokenType} '${token}'`);
+    throw new Error(`Expected string, got '${token}'`);
   }
 
   return token;
@@ -13,7 +13,7 @@ function parseString(token: string, tokenType: TokenType) {
 
 function parseNumber(token: string, tokenType: TokenType) {
   if (tokenType !== TokenType.Number) {
-    throw new Error(`Expected number, got ${tokenType} '${token}'`);
+    throw new Error(`Expected number, got '${token}'`);
   }
 
   const value = Number(token);
@@ -27,7 +27,7 @@ function parseNumber(token: string, tokenType: TokenType) {
 
 function parseBoolean(token: string, tokenType: TokenType) {
   if (tokenType !== TokenType.Symbol) {
-    throw new Error(`Expected boolean, got ${tokenType} '${token}'`);
+    throw new Error(`Expected boolean, got '${token}'`);
   }
 
   switch (token) {
