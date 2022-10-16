@@ -90,8 +90,15 @@ type _Parse<T extends string> = T extends `{${infer Content}}`
     : never
   : Err<[`Expected {...}, got '${T}'`]>;
 
-export type Parse<T extends string> = _Parse<RemoveWhitespace<T>> extends Err<
-  infer E
->
-  ? Err<E>
-  : Resolve<_Parse<RemoveWhitespace<T>>>;
+type RemoveProblemCharactersInStringValues<T extends string> =
+  T extends `${infer Before}:string<${infer Rules}>="${infer _}"${infer After}`
+    ? RemoveProblemCharactersInStringValues<`${Before}:string<${Rules}>=_${After}`>
+    : T extends `${infer Before}:string="${infer _}"${infer After}`
+    ? RemoveProblemCharactersInStringValues<`${Before}:string=_${After}`>
+    : T;
+
+type ResolveIfNotError<T> = T extends Err<infer E> ? Err<E> : Resolve<T>;
+
+export type Parse<T extends string> = ResolveIfNotError<
+  _Parse<RemoveProblemCharactersInStringValues<RemoveWhitespace<T>>>
+>;

@@ -22,6 +22,36 @@ it("parses an object with multiple properties", () => [
   >(),
 ]);
 
+it("makes fields required if a default value is provided", () => [
+  eq<Parse<`{ a: string = "Hello" }`>, { a: string }>(),
+  eq<Parse<`{ a: { b: string = "Hello" } }`>, { a: { b: string } }>(),
+]);
+
+it("deals with problem characters in default values", () => [
+  eq<Parse<`{ a: string = ";"; b: number = 42 }`>, { a: string; b: number }>(),
+  eq<
+    Parse<`{ a: string = ";a:{}"; b: number = 42 }`>,
+    { a: string; b: number }
+  >(),
+  eq<
+    Parse<`{ a: string <rules> = ";<>"; b: number = 42 }`>,
+    { a: string; b: number }
+  >(),
+  eq<
+    Parse<`{ a: string = "'a;:{}"; b: number = 42 }`>,
+    { a: string; b: number }
+  >(),
+
+  /**
+   * @todo We do not have a good way to deal with double quotes within
+   * string values yet.
+   */
+  not_eq<
+    Parse<`{ a: string = "";"; b: number = 42 }`>,
+    { a: string; b: number }
+  >(),
+]);
+
 it("does not require a trailing ';'", () => [
   eq<
     Parse<`{ a: string; b: number }`>,
