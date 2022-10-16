@@ -25,6 +25,8 @@ it("parses an object with multiple properties", () => [
 it("makes fields required if a default value is provided", () => [
   eq<Parse<`{ a: string = "Hello" }`>, { a: string }>(),
   eq<Parse<`{ a: { b: string = "Hello" } }`>, { a: { b: string } }>(),
+  eq<Parse<`{ a: boolean = true }`>, { a: boolean }>(),
+  eq<Parse<`{ a: number = 42 }`>, { a: number }>(),
 ]);
 
 it("deals with problem characters in default values", () => [
