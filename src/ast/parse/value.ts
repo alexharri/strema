@@ -28,6 +28,7 @@ export function parseValue(state: ParserState): ValueNode {
         type: "primitive",
         valueType: token,
         rules: [], // The rules are added later in 'parseProperty'
+        defaultValue: null, // The default value is added later in 'parseProperty'
       };
       state.nextToken();
       break;
