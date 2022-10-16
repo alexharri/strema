@@ -12,15 +12,21 @@ it("returns an error if the string does not match '{...}'", () => [
 it("parses an empty object", () => [eq<Parse<`{}`>, {}>()]);
 
 it("parses an object with a single property", () => [
-  eq<Parse<`{ a: string; }`>, { a: string }>(),
+  eq<Parse<`{ a: string; }`>, { a: string | null }>(),
 ]);
 
 it("parses an object with multiple properties", () => [
-  eq<Parse<`{ a: string; b: number; }`>, { a: string; b: number }>(),
+  eq<
+    Parse<`{ a: string; b: number; }`>,
+    { a: string | null; b: number | null }
+  >(),
 ]);
 
 it("does not require a trailing ';'", () => [
-  eq<Parse<`{ a: string; b: number }`>, { a: string; b: number }>(),
+  eq<
+    Parse<`{ a: string; b: number }`>,
+    { a: string | null; b: number | null }
+  >(),
 ]);
 
 it("requires a ';' beween properties", () => [
@@ -28,7 +34,10 @@ it("requires a ';' beween properties", () => [
    * @todo improve the error message for ',' between properties
    * @todo match the specific error that occurs
    */
-  not_eq<Parse<`{ a: string, b: number }`>, { a: string; b: number }>(),
+  not_eq<
+    Parse<`{ a: string, b: number }`>,
+    { a: string | null; b: number | null }
+  >(),
 ]);
 
 it("parses arrays of primitives", () => [
@@ -58,24 +67,27 @@ it("parses objects as properties", () => [eq<Parse<`{ a: {} }`>, { a: {} }>()]);
 
 it("parses arrays of objects as properties", () => [
   // Array literal syntax
-  eq<Parse<`{ a: { b: number }[] }`>, { a: Array<{ b: number }> }>(),
+  eq<Parse<`{ a: { b: number }[] }`>, { a: Array<{ b: number | null }> }>(),
 
   // Named array syntax
-  eq<Parse<`{ a: Array<{ b: number }> }`>, { a: Array<{ b: number }> }>(),
+  eq<
+    Parse<`{ a: Array<{ b: number }> }`>,
+    { a: Array<{ b: number | null }> }
+  >(),
 ]);
 
 it("parses nested object properties", () => [
   eq<Parse<`{ a: { b: {} } }`>, { a: { b: {} } }>(),
   eq<
     Parse<`{ a: { b: string; c: { d: number } } }`>,
-    { a: { b: string; c: { d: number } } }
+    { a: { b: string | null; c: { d: number | null } } }
   >(),
 ]);
 
 it("parses multiple object properties", () => [
   eq<
     Parse<`{ a: { b: { c: number } }; d: { e: {}; f: {} } }`>,
-    { a: { b: { c: number } }; d: { e: {}; f: {} } }
+    { a: { b: { c: number | null } }; d: { e: {}; f: {} } }
   >(),
 ]);
 

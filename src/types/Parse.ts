@@ -22,6 +22,8 @@ type ParseToken<T extends string> = T extends Primitive
       [`Expected one of [${StringJoin<PrimitivesTuple, ", ">}] but got '${T}'`]
     >;
 
+type Optional<T> = T extends Err<infer E> ? T : T | null;
+
 type FindValue<T extends string> =
   // Array of objects
   T extends `Array<{${infer R}}>`
@@ -37,12 +39,20 @@ type FindValue<T extends string> =
     T extends `${infer Token}[]<${string}>`
     ? ParseToken<Token>[]
     : //
-    // Primitive with rules
-    T extends `${infer Token}<${string}>`
+    // Primitive with rules and a default
+    T extends `${infer Token}<${string}>=${string}`
     ? ParseToken<Token>
     : //
+    // Primitive with default
+    T extends `${infer Token}=${string}`
+    ? ParseToken<Token>
+    : //
+    // Primitive with rules
+    T extends `${infer Token}<${string}>`
+    ? Optional<ParseToken<Token>>
+    : //
       // When none of the above matched, we expect to find just a primitive
-      ParseToken<T>;
+      Optional<ParseToken<T>>;
 
 type KeyValue<T extends string> = T extends `${infer K}:${infer Rest}`
   ? {
