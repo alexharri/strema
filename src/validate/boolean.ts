@@ -1,13 +1,13 @@
 import { typeAsString } from "../format/typeAsString";
 import { ValidationContext } from "../types/ValidationContext";
+import { isNullOrUndefined } from "./utils/isNullOrUndefined";
 import { ValidationError } from "./ValidationError";
 
 export function validateBoolean(
   value: unknown,
   ctx: ValidationContext
 ): ValidationError | null {
-  const isNullOrUndefined = value === undefined || value === null;
-  if (isNullOrUndefined) {
+  if (isNullOrUndefined(value)) {
     return null;
   }
 

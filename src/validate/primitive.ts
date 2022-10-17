@@ -5,6 +5,7 @@ import { ValidationContext } from "../types/ValidationContext";
 import { validateBoolean } from "./boolean";
 import { validateNumber } from "./number";
 import { validateString } from "./string";
+import { isNullOrUndefined } from "./utils/isNullOrUndefined";
 import { ValidationError } from "./ValidationError";
 
 export function validatePrimitive(
@@ -12,9 +13,7 @@ export function validatePrimitive(
   spec: PrimitiveNode,
   ctx: ValidationContext
 ): ValidationError | null {
-  const isNullOrUndefined = typeof value === "undefined" || value === null;
-
-  if (isNullOrUndefined) {
+  if (isNullOrUndefined(value)) {
     value = spec.defaultValue;
   }
 

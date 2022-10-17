@@ -4,6 +4,7 @@ import { ArrayNode } from "../types/Ast";
 import { ValidationContext } from "../types/ValidationContext";
 import { validateObject } from "./object";
 import { validatePrimitive } from "./primitive";
+import { isNullOrUndefined } from "./utils/isNullOrUndefined";
 import { ValidationError } from "./ValidationError";
 
 export function validateArray(
@@ -11,9 +12,7 @@ export function validateArray(
   spec: ArrayNode,
   ctx: ValidationContext
 ): ValidationError | null {
-  const isNullOrUndefined = arr === undefined || arr === null;
-
-  if (isNullOrUndefined) {
+  if (isNullOrUndefined(arr)) {
     return null;
   }
 

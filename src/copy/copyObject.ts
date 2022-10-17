@@ -1,12 +1,12 @@
 import { enforceExhaustive } from "../switch";
 import { ArrayNode, ObjectNode, ValueNode } from "../types/Ast";
+import { isNullOrUndefined } from "../validate/utils/isNullOrUndefined";
 
 function copyProperty(value: unknown, ast: ValueNode): unknown {
   const { type } = ast;
   switch (type) {
     case "primitive":
-      const isNullOrUndefined = typeof value === "undefined" || value === null;
-      if (isNullOrUndefined) return ast.defaultValue;
+      if (isNullOrUndefined(value)) return ast.defaultValue;
       return value;
     case "object":
       return copyObject(value || {}, ast);
