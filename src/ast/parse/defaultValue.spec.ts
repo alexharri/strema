@@ -2,6 +2,18 @@ import { ParserState } from "../state/ParserState";
 import { parseDefaultValue } from "./defaultValue";
 
 describe("parseDefaultValue", () => {
+  it("returns null if the next token is not '='", () => {
+    const templates = [`"Hello, world"`, `<rules>`, `; a: string;`];
+
+    for (const template of templates) {
+      const state = new ParserState(template);
+
+      const value = parseDefaultValue(state, "string");
+
+      expect(value).toEqual(null);
+    }
+  });
+
   it("parses a string default value", () => {
     const state = new ParserState(`= "Hello, world"`);
 
