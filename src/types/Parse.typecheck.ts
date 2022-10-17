@@ -43,13 +43,11 @@ it("deals with problem characters in default values", () => [
     Parse<`{ a: string = "'a;:{}"; b: number = 42 }`>,
     { a: string; b: number }
   >(),
+]);
 
-  /**
-   * @todo We do not have a good way to deal with double quotes within
-   * string values yet.
-   */
-  not_eq<
-    Parse<`{ a: string = "";"; b: number = 42 }`>,
+it("allows double quotes to be escaped via '\\\"'", () => [
+  eq<
+    Parse<`{ a: string = "\\";"; b: number = 42 }`>,
     { a: string; b: number }
   >(),
 ]);

@@ -91,7 +91,9 @@ type _Parse<T extends string> = T extends `{${infer Content}}`
   : Err<[`Expected {...}, got '${T}'`]>;
 
 type RemoveProblemCharactersInStringValues<T extends string> =
-  T extends `${infer Before}:string<${infer Rules}>="${infer _}"${infer After}`
+  T extends `${infer Before}\\"${infer After}`
+    ? RemoveProblemCharactersInStringValues<`${Before}${After}`>
+    : T extends `${infer Before}:string<${infer Rules}>="${infer _}"${infer After}`
     ? RemoveProblemCharactersInStringValues<`${Before}:string<${Rules}>=_${After}`>
     : T extends `${infer Before}:string="${infer _}"${infer After}`
     ? RemoveProblemCharactersInStringValues<`${Before}:string=_${After}`>

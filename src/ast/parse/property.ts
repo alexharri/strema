@@ -1,6 +1,7 @@
 import { PropertyNode } from "../../types/Ast";
 import { ParserState } from "../state/ParserState";
 import { TokenType } from "../token";
+import { parseDefaultValue } from "./defaultValue";
 import { parseRules } from "./rules";
 import { parseValue } from "./value";
 
@@ -48,6 +49,7 @@ export function parseProperty(state: ParserState): PropertyNode {
 
   if (value.type === "primitive") {
     value.rules = parseRules(state, value.valueType);
+    value.defaultValue = parseDefaultValue(state, value.valueType);
   }
 
   const property: PropertyNode = { type: "property", key, value };

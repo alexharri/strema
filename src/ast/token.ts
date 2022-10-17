@@ -3,4 +3,5 @@ export enum TokenType {
   Delimeter = 1,
   Symbol = 2,
   Number = 3,
+  String = 4,
 }

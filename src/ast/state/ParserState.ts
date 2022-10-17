@@ -12,6 +12,8 @@ const delimeters = new Set([
   "(",
   ")",
   ",",
+  "=",
+  '"',
 ]);
 const whitespace = new Set([" ", "\t", "\n"]);
 
@@ -69,6 +71,11 @@ export class ParserState {
 
     const c = this.currentCharacter();
 
+    if (c === '"') {
+      this.nextStringToken();
+      return;
+    }
+
     if (delimeters.has(c)) {
       this.nextDelimeterToken(c);
       return;
@@ -89,6 +96,10 @@ export class ParserState {
 
   private currentCharacter() {
     return this.s.substr(this.index, 1);
+  }
+
+  private characterAtOffset(offset: number) {
+    return this.s.substr(this.index + offset, 1);
   }
 
   private nextSymbolToken(c: string) {
@@ -113,6 +124,35 @@ export class ParserState {
       c = this.currentCharacter();
     }
     this._tokenType = TokenType.Number;
+    this._token = s;
+  }
+
+  private nextStringToken() {
+    this.next();
+
+    let s = "";
+    let c = this.currentCharacter();
+
+    while (true) {
+      if (c === "") {
+        throw new Error("Unexpected end of template");
+      }
+
+      if (c === '"') {
+        this.next();
+        break;
+      }
+
+      if (c === "\\" && this.characterAtOffset(1) === '"') {
+        c = '"';
+        this.next();
+      }
+
+      s += c;
+      this.next();
+      c = this.currentCharacter();
+    }
+    this._tokenType = TokenType.String;
     this._token = s;
   }
 

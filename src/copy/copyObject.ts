@@ -1,15 +1,17 @@
 import { enforceExhaustive } from "../switch";
 import { ArrayNode, ObjectNode, ValueNode } from "../types/Ast";
+import { isNullOrUndefined } from "../validate/utils/isNullOrUndefined";
 
 function copyProperty(value: unknown, ast: ValueNode): unknown {
   const { type } = ast;
   switch (type) {
     case "primitive":
+      if (isNullOrUndefined(value)) return ast.defaultValue;
       return value;
     case "object":
-      return copyObject(value, ast);
+      return copyObject(value || {}, ast);
     case "array":
-      return copyArray(value as unknown[], ast);
+      return copyArray((value as unknown[]) || [], ast);
     default:
       enforceExhaustive(type, "Unexpected type");
   }

@@ -4,6 +4,8 @@ import { PropertyNode } from "../types/Ast";
 import { ValidationContext } from "../types/ValidationContext";
 import { validateArray } from "./array";
 import { validatePrimitive } from "./primitive";
+import { isNullOrUndefined } from "./utils/isNullOrUndefined";
+import { isPlainObject } from "./utils/isPlainObject";
 import { ValidationError } from "./ValidationError";
 
 export function validateObject(
@@ -11,12 +13,11 @@ export function validateObject(
   properties: PropertyNode[],
   ctx: ValidationContext
 ): ValidationError | null {
-  const isNullOrUndefined = obj === undefined || obj === null;
-  if (isNullOrUndefined) {
+  if (isNullOrUndefined(obj)) {
     return null;
   }
 
-  const isNotObjectValue = typeof obj !== "object";
+  const isNotObjectValue = !isPlainObject(obj);
   if (isNotObjectValue) {
     return new ValidationError({
       message: `Expected object value, got ${typeAsString(obj)}`,

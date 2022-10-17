@@ -2,6 +2,7 @@ import { typeAsString } from "../format/typeAsString";
 import { NumberRule } from "../types/Rule";
 import { ValidationContext } from "../types/ValidationContext";
 import { validateNumberRule } from "./rules/number";
+import { isNullOrUndefined } from "./utils/isNullOrUndefined";
 import { ValidationError } from "./ValidationError";
 
 export function validateNumber(
@@ -9,8 +10,7 @@ export function validateNumber(
   rules: NumberRule[],
   ctx: ValidationContext
 ): ValidationError | null {
-  const isNullOrUndefined = value === undefined || value === null;
-  if (isNullOrUndefined) {
+  if (isNullOrUndefined(value)) {
     return null;
   }
 
