@@ -22,7 +22,7 @@ describe("parseDefaultValue", () => {
     expect(value).toEqual("Hello, world");
   });
 
-  it("handles escaped in string default values", () => {
+  it("handles escaped double quotes in string default values", () => {
     const state = new ParserState(`= "Hello, \\"world\\""`);
 
     const value = parseDefaultValue(state, "string");
