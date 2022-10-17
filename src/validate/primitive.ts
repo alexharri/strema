@@ -12,6 +12,12 @@ export function validatePrimitive(
   spec: PrimitiveNode,
   ctx: ValidationContext
 ): ValidationError | null {
+  const isNullOrUndefined = typeof value === "undefined" || value === null;
+
+  if (isNullOrUndefined) {
+    value = spec.defaultValue;
+  }
+
   const { valueType } = spec;
   switch (valueType) {
     case "string": {

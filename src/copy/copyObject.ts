@@ -5,6 +5,8 @@ function copyProperty(value: unknown, ast: ValueNode): unknown {
   const { type } = ast;
   switch (type) {
     case "primitive":
+      const isNullOrUndefined = typeof value === "undefined" || value === null;
+      if (isNullOrUndefined) return ast.defaultValue;
       return value;
     case "object":
       return copyObject(value, ast);
