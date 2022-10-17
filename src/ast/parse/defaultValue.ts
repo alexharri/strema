@@ -64,6 +64,8 @@ export function parseDefaultValue(
   const token = state.token();
   const tokenType = state.tokenType();
 
+  state.nextToken();
+
   switch (primitiveType) {
     case "string":
       return parseString(token, tokenType);
