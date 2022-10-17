@@ -54,6 +54,30 @@ describe("parseDefaultValue", () => {
     expect(value).toEqual(false);
   });
 
+  it("moves to the next token after parsing the default value", () => {
+    const cases = [
+      [`= "Hello";`, "string"],
+      [`= 42;`, "number"],
+      [`= true;`, "boolean"],
+    ] as const;
+
+    for (const [template, type] of cases) {
+      const state = new ParserState(template);
+
+      parseDefaultValue(state, type);
+
+      expect(state.token()).toEqual(";");
+    }
+  });
+
+  it("does not modify the state if there is no default value to be parsed", () => {
+    const state = new ParserState(`;`);
+
+    parseDefaultValue(state, "string");
+
+    expect(state.token()).toEqual(";");
+  });
+
   it("throws if an incorrect default value for a string is provided", () => {
     const numberState = new ParserState(`= 42`);
     const booleanState = new ParserState(`= true`);
