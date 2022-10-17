@@ -30,6 +30,15 @@ describe("copyObject", () => {
     expect(copied).toHaveProperty("c");
   });
 
+  it("creates a new object for object properties", () => {
+    const ast = astFromString(`{ a: {}; }`);
+    const original = { a: {} };
+
+    const copied: any = copyObject(original, ast);
+
+    expect(copied.a === original.a).toEqual(false);
+  });
+
   it("initializes primitives that are not present with null", () => {
     const ast = astFromString(`{ a: string; b: number; c: boolean }`);
 
