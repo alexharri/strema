@@ -9,9 +9,9 @@ function copyProperty(value: unknown, ast: ValueNode): unknown {
       if (isNullOrUndefined) return ast.defaultValue;
       return value;
     case "object":
-      return copyObject(value, ast);
+      return copyObject(value || {}, ast);
     case "array":
-      return copyArray(value as unknown[], ast);
+      return copyArray((value as unknown[]) || [], ast);
     default:
       enforceExhaustive(type, "Unexpected type");
   }

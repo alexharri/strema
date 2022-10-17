@@ -16,7 +16,7 @@ export function validateObject(
     return null;
   }
 
-  const isNotObjectValue = typeof obj !== "object";
+  const isNotObjectValue = Object.prototype !== (obj as any)?.__proto__;
   if (isNotObjectValue) {
     return new ValidationError({
       message: `Expected object value, got ${typeAsString(obj)}`,
