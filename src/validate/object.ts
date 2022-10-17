@@ -4,6 +4,7 @@ import { PropertyNode } from "../types/Ast";
 import { ValidationContext } from "../types/ValidationContext";
 import { validateArray } from "./array";
 import { validatePrimitive } from "./primitive";
+import { isPlainObject } from "./utils/isPlainObject";
 import { ValidationError } from "./ValidationError";
 
 export function validateObject(
@@ -16,7 +17,7 @@ export function validateObject(
     return null;
   }
 
-  const isNotObjectValue = Object.prototype !== (obj as any)?.__proto__;
+  const isNotObjectValue = !isPlainObject(obj);
   if (isNotObjectValue) {
     return new ValidationError({
       message: `Expected object value, got ${typeAsString(obj)}`,
