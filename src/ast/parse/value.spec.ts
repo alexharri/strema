@@ -63,7 +63,7 @@ describe("parseValue", () => {
 
     const parse = () => parseValue(state);
 
-    expect(parse).toThrow(`Unknown symbol 'unknown'`);
+    expect(parse).toThrow(`Unknown primitive symbol 'unknown'`);
   });
 
   it("throws on unexpected delimeters", () => {

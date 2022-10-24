@@ -63,7 +63,7 @@ describe("astFromString", () => {
 
   it("throws an error for non-primitive property symbols", () => {
     const run = () => astFromString("{a:unknown;}");
-    const errorMessage = `Unknown symbol 'unknown'`;
+    const errorMessage = `Unknown primitive symbol 'unknown'`;
 
     expect(run).toThrow(errorMessage);
   });
