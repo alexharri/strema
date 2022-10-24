@@ -81,6 +81,18 @@ type OnMatchedObjectPropertyDuringSplit<
   After extends string
 > = OnMatchedWrappedProperty<Before, InObject, After, StringWrapper<"{", "}">>;
 
+type OnMatchedRecordOfObjectsPropertyDuringSplit<
+  Before extends string,
+  InObject extends string,
+  After extends string,
+  K extends string
+> = OnMatchedWrappedProperty<
+  Before,
+  InObject,
+  After,
+  StringWrapper<`Record<${K},{`, "}>">
+>;
+
 type OnMatchedArrayOfObjectsPropertyDuringSplit<
   Before extends string,
   InObject extends string,
@@ -109,15 +121,28 @@ type OnMatchedWrappedProperty<
 
 type _SplitIntoProperties<T extends string> =
   //
-  // Attempt to match an array of objects (named Array syntax), for example:
+  // Attempt to match a Record of objects:
   //
-  //    `a:Array<{b:string}>;c:number`
+  //    `a:Record<string,{b:string}>;c:number`
   //
   //    Before:   `a:`
   //    InObject: `b:string`
   //    After:    `c:number`
   //
-  T extends `${infer Before}Array<{${infer InObject}}>${infer After}` //
+  T extends `${infer Before}Record<${infer K extends
+    | "string"
+    | "number"},{${infer InObject}}>${infer After}` //
+    ? OnMatchedRecordOfObjectsPropertyDuringSplit<Before, InObject, After, K>
+    : //
+    // Attempt to match an array of objects (named Array syntax), for example:
+    //
+    //    `a:Array<{b:string}>;c:number`
+    //
+    //    Before:   `a:`
+    //    InObject: `b:string`
+    //    After:    `c:number`
+    //
+    T extends `${infer Before}Array<{${infer InObject}}>${infer After}` //
     ? OnMatchedArrayOfObjectsPropertyDuringSplit<Before, InObject, After>
     : //
     // Attempt to match an array of objects (literal array syntax), for example:
