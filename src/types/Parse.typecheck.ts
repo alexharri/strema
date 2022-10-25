@@ -154,6 +154,10 @@ it("parses records of objects with primitives with rules", () => [
   >(),
 ]);
 
+it("parses two-dimensional arrays", () => [
+  eq<Parse<`{ a: number[][] }`>, { a: number[][] }>(),
+]);
+
 it("errors when an invalid symbol is provided for a property value", () => {
   type Err = [
     "Failed to parse value of property 'a'",

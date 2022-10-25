@@ -41,11 +41,11 @@ type FindValue<T extends string, NotNull = false> =
     : //
     // Array of primitives (without rules)
     T extends `${infer Token}[]`
-    ? ParseToken<Token>[]
+    ? FindValue<Token, true>[]
     : //
     // Array of primitives (with rules)
     T extends `${infer Token}[]<${string}>`
-    ? ParseToken<Token>[]
+    ? FindValue<Token, true>[]
     : //
     // Primitive with rules and a default
     T extends `${infer Token}<${string}>=${string}`
