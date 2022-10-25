@@ -171,7 +171,6 @@ describe("copyObject", () => {
 
   it("creates new objects for record properties", () => {
     const ast = astFromString(`{ map: Record<string, { value: number }> }`);
-
     const obj = { value: 42 };
 
     const copied: any = copyObject({ map: { obj } }, ast);
@@ -182,14 +181,12 @@ describe("copyObject", () => {
 
   it("omits null or undefined properties for records", () => {
     const ast = astFromString(`{ map: Record<string, number> }`);
+    const map = { a: 1, b: null, c: undefined };
 
-    const { map } = copyObject(
-      { map: { a: 1, b: null, c: undefined } },
-      ast
-    ) as any;
+    const copied = copyObject({ map }, ast) as any;
 
-    expect(map).toHaveProperty("a");
-    expect(map).not.toHaveProperty("b");
-    expect(map).not.toHaveProperty("c");
+    expect(copied.map).toHaveProperty("a");
+    expect(copied.map).not.toHaveProperty("b");
+    expect(copied.map).not.toHaveProperty("c");
   });
 });
