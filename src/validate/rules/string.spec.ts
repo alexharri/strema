@@ -23,4 +23,32 @@ describe("validateStringRule", () => {
       expect(parse(value)).toThrow("Invalid email address");
     }
   });
+
+  it("enforces the min rule", () => {
+    const parse = createParseFunction(`<min(2)>`);
+
+    const atLeastTwo = ["ab", "abcdefg", "A string"];
+    const lessThanTwo = ["", "a"];
+
+    for (const value of atLeastTwo) {
+      expect(parse(value)).not.toThrow();
+    }
+    for (const value of lessThanTwo) {
+      expect(parse(value)).toThrow("String length must be lower than 2");
+    }
+  });
+
+  it("enforces the max rule", () => {
+    const parse = createParseFunction(`<max(4)>`);
+
+    const fourOrLower = ["abcd", "", "."];
+    const higherThanFour = ["Hello", "Hi, how are you?"];
+
+    for (const value of fourOrLower) {
+      expect(parse(value)).not.toThrow();
+    }
+    for (const value of higherThanFour) {
+      expect(parse(value)).toThrow("String length must not exceed 4");
+    }
+  });
 });

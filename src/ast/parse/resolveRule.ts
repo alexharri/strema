@@ -70,6 +70,27 @@ const ruleTestsByName = ruleTests.reduce((obj, ruleTest) => {
   return obj;
 }, {} as Partial<Record<string, RuleTest>>);
 
+const rulesWithMultiplePrimitiveTypes = (() => {
+  const ruleNameCount: Record<string, number> = {};
+
+  for (const { rule } of ruleTests) {
+    if (!ruleNameCount[rule]) {
+      ruleNameCount[rule] = 0;
+    }
+    ruleNameCount[rule]++;
+  }
+
+  const set = new Set<string>();
+
+  for (const [rule, value] of Object.entries(ruleNameCount)) {
+    if (value > 1) {
+      set.add(rule);
+    }
+  }
+
+  return set;
+})();
+
 export function resolveRule(
   primitiveType: Primitive,
   rule: string,
@@ -83,7 +104,8 @@ export function resolveRule(
     throw new Error(`Unknown rule '${rule}'`);
   }
 
-  if (ruleTest.primitiveType !== primitiveType) {
+  const isWrongPrimitiveType = ruleTest.primitiveType !== primitiveType;
+  if (isWrongPrimitiveType && !rulesWithMultiplePrimitiveTypes.has(rule)) {
     throw new Error(
       `Rule '${rule}' expects a ${ruleTest.primitiveType}, ` +
         `you provided a ${primitiveType} value`

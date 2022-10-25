@@ -21,7 +21,7 @@ function validateMin(
 ): ValidationError | null {
   if (value.length < min) {
     return new ValidationError({
-      message: `String length must not be less than ${min}`,
+      message: `String length must be lower than ${min}`,
       ctx,
       value,
     });
@@ -36,7 +36,7 @@ function validateMax(
 ): ValidationError | null {
   if (value.length > max) {
     return new ValidationError({
-      message: `String length must not be higher than ${max}`,
+      message: `String length must not exceed ${max}`,
       ctx,
       value,
     });
