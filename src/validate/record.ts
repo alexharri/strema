@@ -1,7 +1,6 @@
 import { typeAsString } from "../format/typeAsString";
 import { RecordNode } from "../types/Ast";
 import { ValidationContext } from "../types/ValidationContext";
-import { validatePrimitive } from "./primitive";
 import { isNullOrUndefined } from "./utils/isNullOrUndefined";
 import { isPlainObject } from "./utils/isPlainObject";
 import { ValidationError } from "./ValidationError";
@@ -27,16 +26,19 @@ export function validateRecord(
 
   const entries = Object.entries(record as {});
 
-  for (const [_key, value] of entries) {
-    ctx.path.push(_key);
+  for (const [key, value] of entries) {
+    ctx.path.push(key);
 
-    let key = _key as string | number;
     if (spec.key.valueType === "number") {
-      key = Number(key);
+      const keyAsNumber = Number(key);
+      if (!Number.isFinite(keyAsNumber)) {
+        return new ValidationError({
+          message: `Expected numeric key, got '${key}'`,
+          value: key,
+          ctx,
+        });
+      }
     }
-
-    const keyErr = validatePrimitive(key, spec.key, ctx);
-    if (keyErr) return keyErr;
 
     const valueErr = validateValue(value, spec.value, ctx);
     if (valueErr) return valueErr;
