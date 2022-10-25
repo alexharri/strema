@@ -41,6 +41,8 @@ export function copyRecord(record: unknown, ast: RecordNode): unknown {
   const out: Record<string, unknown> = {};
 
   for (const [key, value] of Object.entries(record || {})) {
+    if (isNullOrUndefined(value)) continue;
+
     out[key] = copyProperty(value, ast.value);
   }
 

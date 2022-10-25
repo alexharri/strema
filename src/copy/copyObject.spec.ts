@@ -179,4 +179,17 @@ describe("copyObject", () => {
     expect(copied.map.obj).toEqual(obj);
     expect(copied.map.obj === obj).toEqual(false);
   });
+
+  it("omits null or undefined properties for records", () => {
+    const ast = astFromString(`{ map: Record<string, number> }`);
+
+    const { map } = copyObject(
+      { map: { a: 1, b: null, c: undefined } },
+      ast
+    ) as any;
+
+    expect(map).toHaveProperty("a");
+    expect(map).not.toHaveProperty("b");
+    expect(map).not.toHaveProperty("c");
+  });
 });
