@@ -17,15 +17,6 @@ describe("parseRecord", () => {
     expect(parsed.key.valueType).toEqual("string");
   });
 
-  it("parses a string key", () => {
-    const state = new ParserState(`Record<string, number>`);
-
-    const parsed = parseRecord(state);
-
-    expect(parsed.key.type).toEqual("primitive");
-    expect(parsed.key.valueType).toEqual("string");
-  });
-
   it("parses a number key", () => {
     const state = new ParserState(`Record<number, boolean>`);
 
