@@ -44,6 +44,14 @@ describe("parseRecord", () => {
     expect(parse).toThrow("Unknown primitive symbol 'symbol'");
   });
 
+  it("does not support key rules", () => {
+    const state = new ParserState(`Record<string <email>, boolean>`);
+
+    const parse = () => parseRecord(state);
+
+    expect(parse).toThrow("Expected ',', got '<'");
+  });
+
   it("parses a primitive value", () => {
     const state = new ParserState(`Record<string, boolean>`);
 
