@@ -69,7 +69,7 @@ describe("parseRule", () => {
 
     const parse = () => parseRule(state, "string");
 
-    expect(parse).toThrow("Unknown rule 'emial'");
+    expect(parse).toThrow("Unknown string rule 'emial'");
   });
 
   it("throws an error if the primitive type does not match", () => {
@@ -77,9 +77,7 @@ describe("parseRule", () => {
 
     const parse = () => parseRule(state, "number");
 
-    expect(parse).toThrow(
-      "Rule 'email' expects a string, you provided a number value"
-    );
+    expect(parse).toThrow("Unknown number rule 'email'");
   });
 });
 

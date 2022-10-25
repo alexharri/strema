@@ -16,6 +16,30 @@ const ruleTests: RuleTest[] = [
     toRule: () => ({ type: "email" }),
   },
   {
+    rule: "min",
+    primitiveType: "string",
+    requiresNumericArgument: true,
+    toRule: (arg) => ({ type: "min", value: arg! }),
+  },
+  {
+    rule: "max",
+    primitiveType: "string",
+    requiresNumericArgument: true,
+    toRule: (arg) => ({ type: "max", value: arg! }),
+  },
+  {
+    rule: "length",
+    primitiveType: "string",
+    requiresNumericArgument: true,
+    toRule: (arg) => ({ type: "length", value: arg! }),
+  },
+  {
+    rule: "uuid",
+    primitiveType: "string",
+    requiresNumericArgument: false,
+    toRule: () => ({ type: "uuid" }),
+  },
+  {
     rule: "positive",
     primitiveType: "number",
     requiresNumericArgument: false,
@@ -41,10 +65,13 @@ const ruleTests: RuleTest[] = [
   },
 ];
 
-const ruleTestsByName = ruleTests.reduce((obj, ruleTest) => {
-  obj[ruleTest.rule] = ruleTest;
+const ruleTestsByTypeAndName = ruleTests.reduce((obj, ruleTest) => {
+  if (!obj[ruleTest.primitiveType]) {
+    obj[ruleTest.primitiveType] = {};
+  }
+  obj[ruleTest.primitiveType]![ruleTest.rule] = ruleTest;
   return obj;
-}, {} as Partial<Record<string, RuleTest>>);
+}, {} as Partial<Record<Primitive, Partial<Record<string, RuleTest>>>>);
 
 export function resolveRule(
   primitiveType: Primitive,
@@ -53,17 +80,10 @@ export function resolveRule(
 ) {
   const hasArg = arg !== null;
 
-  const ruleTest = ruleTestsByName[rule];
+  const ruleTest = ruleTestsByTypeAndName[primitiveType]?.[rule];
 
   if (!ruleTest) {
-    throw new Error(`Unknown rule '${rule}'`);
-  }
-
-  if (ruleTest.primitiveType !== primitiveType) {
-    throw new Error(
-      `Rule '${rule}' expects a ${ruleTest.primitiveType}, ` +
-        `you provided a ${primitiveType} value`
-    );
+    throw new Error(`Unknown ${primitiveType} rule '${rule}'`);
   }
 
   if (ruleTest.requiresNumericArgument && !hasArg) {
