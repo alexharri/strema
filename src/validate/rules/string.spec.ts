@@ -65,4 +65,21 @@ describe("validateStringRule", () => {
       expect(parse(value)).toThrow("String length must equal 4");
     }
   });
+
+  it("enforces the uuid rule", () => {
+    const parse = createParseFunction(`<uuid>`);
+
+    const uuids = [
+      "e1839888-6967-49c8-9134-eab4e0894436",
+      "c6e3542c-546e-11ed-bdc3-0242ac120002",
+    ];
+    const notUuids = ["57f13f4-1a76-4b95-9e8-95e5470387d", "", "not-a-uuid"];
+
+    for (const value of uuids) {
+      expect(parse(value)).not.toThrow();
+    }
+    for (const value of notUuids) {
+      expect(parse(value)).toThrow("String is not a valid uuid");
+    }
+  });
 });
