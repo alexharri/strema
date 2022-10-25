@@ -65,4 +65,11 @@ it("splits a record correctly", () => [
   >(),
 ]);
 
+it("splits a record of primitives with rules correctly", () => [
+  eq<
+    SplitIntoProperties<`a:Record<string,string<email>>;b:string;`>,
+    ["a:Record<string,string<email>>", "b:string"]
+  >(),
+]);
+
 /** @todo test error cases */
