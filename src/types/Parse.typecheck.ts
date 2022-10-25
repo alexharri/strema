@@ -129,7 +129,7 @@ it("parses records", () => [
   >(),
 ]);
 
-it("records of records", () => [
+it("parses records of records", () => [
   eq<
     Parse<`{ a: Record<string, Record<number, boolean>> }`>,
     { a: Record<string, Record<number, boolean>> }
