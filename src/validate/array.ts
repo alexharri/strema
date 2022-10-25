@@ -1,11 +1,9 @@
 import { typeAsString } from "../format/typeAsString";
-import { enforceExhaustive } from "../switch";
 import { ArrayNode } from "../types/Ast";
 import { ValidationContext } from "../types/ValidationContext";
-import { validateObject } from "./object";
-import { validatePrimitive } from "./primitive";
 import { isNullOrUndefined } from "./utils/isNullOrUndefined";
 import { ValidationError } from "./ValidationError";
+import { validateValue } from "./value";
 
 export function validateArray(
   arr: unknown[],
@@ -30,26 +28,9 @@ export function validateArray(
     ctx.path.push(`[${i}]`);
 
     const value = arr[i];
-    const { type } = spec.value;
-    switch (type) {
-      case "object": {
-        const err = validateObject(value, spec.value.properties, ctx);
-        if (err) return err;
-        break;
-      }
-      case "array": {
-        const err = validateArray(value, spec.value, ctx);
-        if (err) return err;
-        break;
-      }
-      case "primitive": {
-        const err = validatePrimitive(value, spec.value, ctx);
-        if (err) return err;
-        break;
-      }
-      default:
-        enforceExhaustive(type, "Unexpected value type");
-    }
+
+    const err = validateValue(value, spec.value, ctx);
+    if (err) return err;
 
     ctx.path.pop();
   }
