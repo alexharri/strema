@@ -16,6 +16,30 @@ const ruleTests: RuleTest[] = [
     toRule: () => ({ type: "email" }),
   },
   {
+    rule: "min",
+    primitiveType: "string",
+    requiresNumericArgument: true,
+    toRule: (arg) => ({ type: "max", value: arg! }),
+  },
+  {
+    rule: "max",
+    primitiveType: "string",
+    requiresNumericArgument: true,
+    toRule: (arg) => ({ type: "max", value: arg! }),
+  },
+  {
+    rule: "length",
+    primitiveType: "string",
+    requiresNumericArgument: true,
+    toRule: (arg) => ({ type: "length", value: arg! }),
+  },
+  {
+    rule: "uuid",
+    primitiveType: "string",
+    requiresNumericArgument: false,
+    toRule: () => ({ type: "uuid" }),
+  },
+  {
     rule: "positive",
     primitiveType: "number",
     requiresNumericArgument: false,
