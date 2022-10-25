@@ -1,12 +1,10 @@
 import { typeAsString } from "../format/typeAsString";
-import { enforceExhaustive } from "../switch";
 import { PropertyNode } from "../types/Ast";
 import { ValidationContext } from "../types/ValidationContext";
-import { validateArray } from "./array";
-import { validatePrimitive } from "./primitive";
 import { isNullOrUndefined } from "./utils/isNullOrUndefined";
 import { isPlainObject } from "./utils/isPlainObject";
 import { ValidationError } from "./ValidationError";
+import { validateValue } from "./value";
 
 export function validateObject(
   obj: unknown,
@@ -26,30 +24,13 @@ export function validateObject(
     });
   }
 
-  for (const { key, value: valueSpec } of properties) {
-    ctx.path.push(key);
+  for (const property of properties) {
+    ctx.path.push(property.key);
 
-    const { type } = valueSpec;
-    const value = (obj as Record<string, unknown>)[key];
-    switch (type) {
-      case "object": {
-        const err = validateObject(value, valueSpec.properties, ctx);
-        if (err) return err;
-        break;
-      }
-      case "array": {
-        const err = validateArray(value as unknown[], valueSpec, ctx);
-        if (err) return err;
-        break;
-      }
-      case "primitive": {
-        const err = validatePrimitive(value, valueSpec, ctx);
-        if (err) return err;
-        break;
-      }
-      default:
-        enforceExhaustive(type, "Unexpected value type");
-    }
+    const value = (obj as Record<string, unknown>)[property.key];
+
+    const err = validateValue(value, property.value, ctx);
+    if (err) return err;
 
     ctx.path.pop();
   }

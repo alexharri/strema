@@ -1,5 +1,5 @@
 import { enforceExhaustive } from "../switch";
-import { ArrayNode, ObjectNode, ValueNode } from "../types/Ast";
+import { ArrayNode, ObjectNode, RecordNode, ValueNode } from "../types/Ast";
 import { isNullOrUndefined } from "../validate/utils/isNullOrUndefined";
 
 function copyProperty(value: unknown, ast: ValueNode): unknown {
@@ -12,6 +12,8 @@ function copyProperty(value: unknown, ast: ValueNode): unknown {
       return copyObject(value || {}, ast);
     case "array":
       return copyArray((value as unknown[]) || [], ast);
+    case "record":
+      return copyRecord((value as unknown[]) || [], ast);
     default:
       enforceExhaustive(type, "Unexpected type");
   }
@@ -33,4 +35,14 @@ export function copyObject(object: unknown, ast: ObjectNode): unknown {
   }
 
   return to;
+}
+
+export function copyRecord(record: unknown, ast: RecordNode): unknown {
+  const out: Record<string, unknown> = {};
+
+  for (const [key, value] of Object.entries(record || {})) {
+    out[key] = copyProperty(value, ast.value);
+  }
+
+  return out;
 }

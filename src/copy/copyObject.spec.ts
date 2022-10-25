@@ -152,4 +152,31 @@ describe("copyObject", () => {
 
     expect(copied.obj).toEqual({ value: 42 });
   });
+
+  it("initializes records to an empty object if not provided", () => {
+    const ast = astFromString(`{ map: Record<string, {}> }`);
+
+    const copied: any = copyObject({}, ast);
+
+    expect(copied).toEqual({ map: {} });
+  });
+
+  it("copies the elements of a record", () => {
+    const ast = astFromString(`{ map: Record<string, number> }`);
+
+    const copied: any = copyObject({ map: { a: 1, b: 2, c: 3 } }, ast);
+
+    expect(copied.map).toEqual({ a: 1, b: 2, c: 3 });
+  });
+
+  it("creates new objects for record properties", () => {
+    const ast = astFromString(`{ map: Record<string, { value: number }> }`);
+
+    const obj = { value: 42 };
+
+    const copied: any = copyObject({ map: { obj } }, ast);
+
+    expect(copied.map.obj).toEqual(obj);
+    expect(copied.map.obj === obj).toEqual(false);
+  });
 });
