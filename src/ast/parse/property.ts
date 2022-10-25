@@ -1,4 +1,4 @@
-import { PropertyNode } from "../../types/Ast";
+import { PropertyNode, ValueNode } from "../../types/Ast";
 import { ParserState } from "../state/ParserState";
 import { TokenType } from "../token";
 import { parseDefaultValue } from "./defaultValue";
@@ -33,6 +33,22 @@ function parseIsArray(state: ParserState) {
   return isArray;
 }
 
+export function parseArrayableValueAndRules(state: ParserState): ValueNode {
+  const value = parseValue(state);
+  const isArray = parseIsArray(state);
+
+  if (value.type === "primitive") {
+    value.rules = parseRules(state, value.valueType);
+    value.defaultValue = parseDefaultValue(state, value.valueType);
+  }
+
+  if (isArray) {
+    return { type: "array", value };
+  }
+
+  return value;
+}
+
 export function parseProperty(state: ParserState): PropertyNode {
   const key = parseKey(state);
 
@@ -44,19 +60,9 @@ export function parseProperty(state: ParserState): PropertyNode {
 
   state.nextToken();
 
-  const value = parseValue(state);
-  const isArray = parseIsArray(state);
-
-  if (value.type === "primitive") {
-    value.rules = parseRules(state, value.valueType);
-    value.defaultValue = parseDefaultValue(state, value.valueType);
-  }
+  const value = parseArrayableValueAndRules(state);
 
   const property: PropertyNode = { type: "property", key, value };
-
-  if (isArray) {
-    property.value = { type: "array", value: property.value };
-  }
 
   return property;
 }

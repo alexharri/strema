@@ -58,4 +58,18 @@ it("does not split nested object properties", () => [
   >(),
 ]);
 
+it("splits a record correctly", () => [
+  eq<
+    SplitIntoProperties<`a:Record<string,{b:number}>;c:number`>,
+    [`a:Record<string,{b:number}>`, `c:number`]
+  >(),
+]);
+
+it("splits a record of primitives with rules correctly", () => [
+  eq<
+    SplitIntoProperties<`a:Record<string,string<email>>;b:string;`>,
+    ["a:Record<string,string<email>>", "b:string"]
+  >(),
+]);
+
 /** @todo test error cases */

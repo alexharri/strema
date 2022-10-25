@@ -4,6 +4,7 @@ import { parseObject } from "./object";
 import { ParserState } from "../state/ParserState";
 import { TokenType } from "../token";
 import { PrimitivesTuple } from "../../types/Primitive";
+import { parseRecord } from "./record";
 
 const primitiveList: PrimitivesTuple = ["string", "number", "boolean"];
 const primitives = new Set(primitiveList);
@@ -21,8 +22,13 @@ export function parseValue(state: ParserState): ValueNode {
   switch (tokenType) {
     case TokenType.Symbol: {
       const token = state.token();
+
+      if (token === "Record") {
+        return parseRecord(state);
+      }
+
       if (!isPrimitiveSymbol(token)) {
-        throw new Error(`Unknown symbol '${token}'`);
+        throw new Error(`Unknown primitive symbol '${token}'`);
       }
       value = {
         type: "primitive",

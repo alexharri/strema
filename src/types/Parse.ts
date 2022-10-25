@@ -22,11 +22,19 @@ type ParseToken<T extends string> = T extends Primitive
       [`Expected one of [${StringJoin<PrimitivesTuple, ", ">}] but got '${T}'`]
     >;
 
-type Optional<T> = T extends Err<infer E> ? T : T | null;
+type Optional<T, NotNull = false> = T extends Err<infer E>
+  ? Err<E>
+  : NotNull extends true
+  ? T
+  : T | null;
 
-type FindValue<T extends string> =
-  // Array of objects
-  T extends `Array<{${infer R}}>`
+type FindValue<T extends string, NotNull = false> =
+  // Record
+  T extends `Record<${infer K extends "string" | "number"},${infer R}>`
+    ? Record<TokenToValue[K], FindValue<R, true>>
+    : //
+    // Array of objects
+    T extends `Array<{${infer R}}>`
     ? _Parse<`{${R}}`>[]
     : T extends `{${infer R}}`
     ? _Parse<`{${R}}`>
@@ -49,10 +57,10 @@ type FindValue<T extends string> =
     : //
     // Primitive with rules
     T extends `${infer Token}<${string}>`
-    ? Optional<ParseToken<Token>>
+    ? Optional<ParseToken<Token>, NotNull>
     : //
       // When none of the above matched, we expect to find just a primitive
-      Optional<ParseToken<T>>;
+      Optional<ParseToken<T>, NotNull>;
 
 type KeyValue<T extends string> = T extends `${infer K}:${infer Rest}`
   ? {

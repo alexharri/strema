@@ -19,11 +19,17 @@ export interface ObjectNode {
   properties: PropertyNode[];
 }
 
+export interface RecordNode {
+  type: "record";
+  key: PrimitiveNode;
+  value: ValueNode;
+}
+
 export interface ArrayNode {
   type: "array";
   value: ValueNode;
 }
 
-export type ValueNode = PrimitiveNode | ArrayNode | ObjectNode;
+export type ValueNode = PrimitiveNode | ArrayNode | ObjectNode | RecordNode;
 
 export type Ast = ObjectNode;

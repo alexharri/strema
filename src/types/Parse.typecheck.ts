@@ -121,6 +121,39 @@ it("parses multiple object properties", () => [
   >(),
 ]);
 
+it("parses records", () => [
+  eq<Parse<`{ a: Record<string, number> }`>, { a: Record<string, number> }>(),
+  eq<
+    Parse<`{ a: Record<string, { value: number }> }`>,
+    { a: Record<string, { value: number | null }> }
+  >(),
+]);
+
+it("parses records of records", () => [
+  eq<
+    Parse<`{ a: Record<string, Record<number, boolean>> }`>,
+    { a: Record<string, Record<number, boolean>> }
+  >(),
+  eq<
+    Parse<`{ a: Record<string, { a: Record<number, { b: boolean }>}> }`>,
+    { a: Record<string, { a: Record<number, { b: boolean | null }> }> }
+  >(),
+]);
+
+it("parses records of primitives with rules", () => [
+  eq<
+    Parse<`{ a: Record<string, string <email>>; b: string; }`>,
+    { a: Record<string, string>; b: string | null }
+  >(),
+]);
+
+it("parses records of objects with primitives with rules", () => [
+  eq<
+    Parse<`{ a: Record<string, { email: string <email> }>; b: string; }`>,
+    { a: Record<string, { email: string | null }>; b: string | null }
+  >(),
+]);
+
 it("errors when an invalid symbol is provided for a property value", () => {
   type Err = [
     "Failed to parse value of property 'a'",
