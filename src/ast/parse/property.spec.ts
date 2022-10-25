@@ -126,4 +126,15 @@ describe("parseProperties", () => {
 
     expect(parse).toThrow("Unexpected token '<'");
   });
+
+  it("parses an array of records", () => {
+    const state = new ParserState(`records: Record<string, number>[]`);
+
+    const property = parseProperty(state);
+    const value = property.value as ArrayNode;
+
+    expect(property.key).toEqual("records");
+    expect(value.type).toEqual("array");
+    expect(value.value.type).toEqual("record");
+  });
 });
