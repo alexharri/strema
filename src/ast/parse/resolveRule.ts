@@ -19,7 +19,7 @@ const ruleTests: RuleTest[] = [
     rule: "min",
     primitiveType: "string",
     requiresNumericArgument: true,
-    toRule: (arg) => ({ type: "max", value: arg! }),
+    toRule: (arg) => ({ type: "min", value: arg! }),
   },
   {
     rule: "max",
@@ -65,31 +65,13 @@ const ruleTests: RuleTest[] = [
   },
 ];
 
-const ruleTestsByName = ruleTests.reduce((obj, ruleTest) => {
-  obj[ruleTest.rule] = ruleTest;
+const ruleTestsByTypeAndName = ruleTests.reduce((obj, ruleTest) => {
+  if (!obj[ruleTest.primitiveType]) {
+    obj[ruleTest.primitiveType] = {};
+  }
+  obj[ruleTest.primitiveType]![ruleTest.rule] = ruleTest;
   return obj;
-}, {} as Partial<Record<string, RuleTest>>);
-
-const rulesWithMultiplePrimitiveTypes = (() => {
-  const ruleNameCount: Record<string, number> = {};
-
-  for (const { rule } of ruleTests) {
-    if (!ruleNameCount[rule]) {
-      ruleNameCount[rule] = 0;
-    }
-    ruleNameCount[rule]++;
-  }
-
-  const set = new Set<string>();
-
-  for (const [rule, value] of Object.entries(ruleNameCount)) {
-    if (value > 1) {
-      set.add(rule);
-    }
-  }
-
-  return set;
-})();
+}, {} as Partial<Record<Primitive, Partial<Record<string, RuleTest>>>>);
 
 export function resolveRule(
   primitiveType: Primitive,
@@ -98,18 +80,10 @@ export function resolveRule(
 ) {
   const hasArg = arg !== null;
 
-  const ruleTest = ruleTestsByName[rule];
+  const ruleTest = ruleTestsByTypeAndName[primitiveType]?.[rule];
 
   if (!ruleTest) {
-    throw new Error(`Unknown rule '${rule}'`);
-  }
-
-  const isWrongPrimitiveType = ruleTest.primitiveType !== primitiveType;
-  if (isWrongPrimitiveType && !rulesWithMultiplePrimitiveTypes.has(rule)) {
-    throw new Error(
-      `Rule '${rule}' expects a ${ruleTest.primitiveType}, ` +
-        `you provided a ${primitiveType} value`
-    );
+    throw new Error(`Unknown ${primitiveType} rule '${rule}'`);
   }
 
   if (ruleTest.requiresNumericArgument && !hasArg) {
