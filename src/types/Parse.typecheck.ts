@@ -147,6 +147,13 @@ it("parses records of primitives with rules", () => [
   >(),
 ]);
 
+it("parses records of objects with primitives with rules", () => [
+  eq<
+    Parse<`{ a: Record<string, { email: string <email> }>; b: string; }`>,
+    { a: Record<string, { email: string | null }>; b: string | null }
+  >(),
+]);
+
 it("errors when an invalid symbol is provided for a property value", () => {
   type Err = [
     "Failed to parse value of property 'a'",
