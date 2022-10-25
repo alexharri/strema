@@ -101,7 +101,7 @@ type OnMatchedArrayOfObjectsPropertyDuringSplit<
   Before,
   InObject,
   After,
-  StringWrapper<"Array<{", "}>">
+  StringWrapper<"{", "}[]">
 >;
 
 type OnMatchedWrappedProperty<
