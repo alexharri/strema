@@ -51,4 +51,18 @@ describe("validateStringRule", () => {
       expect(parse(value)).toThrow("String length must not exceed 4");
     }
   });
+
+  it("enforces the length rule", () => {
+    const parse = createParseFunction(`<length(4)>`);
+
+    const four = ["abcd", "1234", ".__."];
+    const notFour = ["Not four", "", "Way more than four"];
+
+    for (const value of four) {
+      expect(parse(value)).not.toThrow();
+    }
+    for (const value of notFour) {
+      expect(parse(value)).toThrow("String length must equal 4");
+    }
+  });
 });
