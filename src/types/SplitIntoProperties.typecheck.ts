@@ -46,15 +46,48 @@ it("does not split properties if ';' is not used by a separator", () => [
 it("does not split nested object properties", () => [
   eq<
     SplitIntoProperties<`a:{b:{c:{}}};d:string;e:{}`>,
-    [`a:{b:{c:{};}}`, `d:string`, `e:{}`]
+    [`a:{b:{c:{}}}`, `d:string`, `e:{}`]
   >(),
   eq<
     SplitIntoProperties<`a:{b:{c:{};d:{};e:{}}}`>,
-    [`a:{b:{c:{};d:{};e:{};}}`]
+    [`a:{b:{c:{};d:{};e:{}}}`]
   >(),
   eq<
     SplitIntoProperties<`a:{b:{c:{}}}[];d:string;e:{}`>,
-    [`a:Array<{b:{c:{}}}>`, `d:string`, `e:{}`]
+    [`a:{b:{c:{}}}[]`, `d:string`, `e:{}`]
+  >(),
+]);
+
+it("splits N-dimensional arrays of objects", () => [
+  eq<SplitIntoProperties<`a:string;b:{}[][]`>, [`a:string`, `b:{}[][]`]>(),
+  eq<SplitIntoProperties<`a:{}[][];b:string`>, [`a:{}[][]`, `b:string`]>(),
+  eq<
+    SplitIntoProperties<`a:{}[][];b:string;c:{}[][]`>,
+    [`a:{}[][]`, `b:string`, `c:{}[][]`]
+  >(),
+  eq<
+    SplitIntoProperties<`a:{}[];b:string[][];c:{}[][]`>,
+    [`a:{}[]`, `b:string[][]`, `c:{}[][]`]
+  >(),
+]);
+
+it("splits N-dimensional arrays of objects with object properties", () => [
+  eq<SplitIntoProperties<`a:{b:{}[]}[];c:{}`>, ["a:{b:{}[]}[]", "c:{}"]>(),
+  eq<
+    SplitIntoProperties<`a:string;b:{c:{}[][]}[][];d:{}[][]`>,
+    [`a:string`, `b:{c:{}[][]}[][]`, `d:{}[][]`]
+  >(),
+  eq<
+    SplitIntoProperties<`a:string;b:{c:number[][]<int>}[][];g:{}[][]`>,
+    [`a:string`, `b:{c:number[][]<int>}[][]`, `g:{}[][]`]
+  >(),
+  eq<
+    SplitIntoProperties<`a:string;b:{c:{d:number[]<int>;e:{f:string[]<email>}[]}[]}[];g:{}[]`>,
+    [
+      `a:string`,
+      `b:{c:{d:number[]<int>;e:{f:string[]<email>}[]}[]}[]`,
+      `g:{}[]`
+    ]
   >(),
 ]);
 

@@ -156,6 +156,22 @@ it("parses N-dimensional arrays of primitives", () => [
   eq<Parse<`{ a: number[][][][] }`>, { a: number[][][][] }>(),
 ]);
 
+it("parses N-dimensional arrays of objects", () => [
+  eq<Parse<`{ a: { a:string; }[][] }`>, { a: { a: string | null }[][] }>(),
+  eq<
+    Parse<`{ a: { a:string; }[][][][] }`>,
+    { a: { a: string | null }[][][][] }
+  >(),
+]);
+
+it("parses nested N-dimensional arrays", () => [
+  eq<Parse<`{ a: { a:string; }[][] }`>, { a: { a: string | null }[][] }>(),
+  eq<
+    Parse<`{ a: { b:string = "Hello"; c: { d: number[][][] }[] }[][]; b: string[][]; }`>,
+    { a: { b: string; c: { d: number[][][] }[] }[][]; b: string[][] }
+  >(),
+]);
+
 it("errors when an invalid symbol is provided for a property value", () => {
   type Err = [
     "Failed to parse value of property 'a'",
