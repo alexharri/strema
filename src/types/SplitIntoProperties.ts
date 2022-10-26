@@ -75,12 +75,6 @@ type StringAsTuple<T extends string> = T extends ""
 
 type StringLength<T extends string> = StringAsTuple<T>["length"];
 
-type OnMatchedObjectPropertyDuringSplit<
-  Before extends string,
-  InObject extends string,
-  After extends string
-> = OnMatchedWrappedProperty<Before, InObject, After, StringWrapper<"{", "}">>;
-
 type OnMatchedRecordOfObjectsPropertyDuringSplit<
   Before extends string,
   InObject extends string,
@@ -93,15 +87,16 @@ type OnMatchedRecordOfObjectsPropertyDuringSplit<
   StringWrapper<`Record<${K},{`, "}>">
 >;
 
-type OnMatchedArrayOfObjectsPropertyDuringSplit<
+type OnMatchedObjectPropertyDuringSplit<
   Before extends string,
   InObject extends string,
-  After extends string
+  After extends string,
+  Arrays extends string
 > = OnMatchedWrappedProperty<
   Before,
   InObject,
   After,
-  StringWrapper<"Array<{", "}>">
+  StringWrapper<"{", `}${Arrays}`>
 >;
 
 type OnMatchedWrappedProperty<
@@ -134,45 +129,36 @@ type _SplitIntoProperties<T extends string> =
     | "number"},{${infer InObject}}>${infer After}` //
     ? OnMatchedRecordOfObjectsPropertyDuringSplit<Before, InObject, After, K>
     : //
-    // Attempt to match an array of objects (named Array syntax), for example:
+    // Match an object (0-N dimensional array) property with an additional property
+    // after it, for example:
     //
-    //    `a:Array<{b:string}>;c:number`
-    //
-    //    Before:   `a:`
-    //    InObject: `b:string`
-    //    After:    `c:number`
-    //
-    T extends `${infer Before}Array<{${infer InObject}}>${infer After}` //
-    ? OnMatchedArrayOfObjectsPropertyDuringSplit<Before, InObject, After>
-    : //
-    // Attempt to match an array of objects (literal array syntax), for example:
-    //
-    //    `a:{b:string}[];c:number`
+    //    `a:{b:string}[][];c:number`
     //
     //    Before:   `a:`
     //    InObject: `b:string`
     //    After:    `c:number`
+    //    Arrays:   `[][]`
     //
-    T extends `${infer Before}{${infer InObject}}[]${infer After}`
-    ? OnMatchedArrayOfObjectsPropertyDuringSplit<Before, InObject, After>
+    T extends `${infer Before}{${infer InObject}}${infer Arrays};${infer After}`
+    ? OnMatchedObjectPropertyDuringSplit<Before, InObject, After, Arrays>
     : //
-    // Attempt to match an object property, for example:
+    // Attempt to match object (0-N dimensional array) with no additional
+    // properties, for example:
     //
-    //    `a:{b:string};c:number`
-    //
-    // This gets split into:
+    //    `a:{b:string}[][]`
     //
     //    Before:   `a:`
     //    InObject: `b:string`
-    //    After:    `c:number`
+    //    Arrays:   `[][]`
     //
-    T extends `${infer Before}{${infer InObject}}${infer After}`
-    ? OnMatchedObjectPropertyDuringSplit<Before, InObject, After>
+    T extends `${infer Before}{${infer InObject}}${infer Arrays}`
+    ? OnMatchedObjectPropertyDuringSplit<Before, InObject, "", Arrays>
     : //
-    // We did not match any array or object syntaxes:
+    // We did not match any special cases:
     //
+    //    `key:Record<K, {...}>`
     //    `key:primitive[]`
-    //    `key:Array<{...}>`
+    //    `key:{...}`
     //    `key:{...}[]`
     //
     // This means that we are only dealing with primitives in the form:

@@ -33,19 +33,26 @@ type FindValue<T extends string, NotNull = false> =
   T extends `Record<${infer K extends "string" | "number"},${infer R}>`
     ? Record<TokenToValue[K], FindValue<R, true>>
     : //
-    // Array of objects
-    T extends `Array<{${infer R}}>`
-    ? _Parse<`{${R}}`>[]
-    : T extends `{${infer R}}`
+    // Object primitive
+    T extends `{${infer R}}`
     ? _Parse<`{${R}}`>
     : //
-    // Array of primitives (without rules)
-    T extends `${infer Token}[]`
-    ? ParseToken<Token>[]
+    // One of:
+    //  1. Array of primitives without rules (such as `string[]`)
+    //  2. Array of objects, Records, etc (such as `{...}[]` or `Record<>[]`)
+    //
+    // We handle N-dimensional arrays by recursively calling `FindValue`:
+    //
+    //    FindValue<`{}[][]`> -> FindValue<`{}[]`>[]
+    //    FindValue<`{}[]`>[] -> FindValue<`{}`>[][]
+    //    FindValue<`{}`>[][] -> {}[][]
+    //
+    T extends `${infer Before}[]`
+    ? FindValue<Before, true>[]
     : //
     // Array of primitives (with rules)
     T extends `${infer Token}[]<${string}>`
-    ? ParseToken<Token>[]
+    ? FindValue<Token, true>[]
     : //
     // Primitive with rules and a default
     T extends `${infer Token}<${string}>=${string}`

@@ -97,13 +97,10 @@ it("parses objects as properties", () => [eq<Parse<`{ a: {} }`>, { a: {} }>()]);
 
 it("parses arrays of objects as properties", () => [
   // Array literal syntax
-  eq<Parse<`{ a: { b: number }[] }`>, { a: Array<{ b: number | null }> }>(),
+  eq<Parse<`{ a: { b: number }[] }`>, { a: { b: number | null }[] }>(),
 
   // Named array syntax
-  eq<
-    Parse<`{ a: Array<{ b: number }> }`>,
-    { a: Array<{ b: number | null }> }
-  >(),
+  eq<Parse<`{ a: { b: number }[] }`>, { a: { b: number | null }[] }>(),
 ]);
 
 it("parses nested object properties", () => [
@@ -154,6 +151,27 @@ it("parses records of objects with primitives with rules", () => [
   >(),
 ]);
 
+it("parses N-dimensional arrays of primitives", () => [
+  eq<Parse<`{ a: number[][] }`>, { a: number[][] }>(),
+  eq<Parse<`{ a: number[][][][] }`>, { a: number[][][][] }>(),
+]);
+
+it("parses N-dimensional arrays of objects", () => [
+  eq<Parse<`{ a: { a:string; }[][] }`>, { a: { a: string | null }[][] }>(),
+  eq<
+    Parse<`{ a: { a:string; }[][][][] }`>,
+    { a: { a: string | null }[][][][] }
+  >(),
+]);
+
+it("parses nested N-dimensional arrays", () => [
+  eq<Parse<`{ a: { a:string; }[][] }`>, { a: { a: string | null }[][] }>(),
+  eq<
+    Parse<`{ a: { b:string = "Hello"; c: { d: number[][][] }[] }[][]; b: string[][]; }`>,
+    { a: { b: string; c: { d: number[][][] }[] }[][]; b: string[][] }
+  >(),
+]);
+
 it("errors when an invalid symbol is provided for a property value", () => {
   type Err = [
     "Failed to parse value of property 'a'",
@@ -169,5 +187,5 @@ it("returns a helpful error message if a key is not properly specified", () => [
     CompileError<["Expected key in format '<key>:', got 'a'"]>
   >(),
   eq<Parse<`{{}}`>, CompileError<["Expected a key before '{}'"]>>(),
-  eq<Parse<`{{}[]}`>, CompileError<["Expected a key before 'Array<{}>'"]>>(),
+  eq<Parse<`{{}[]}`>, CompileError<["Expected a key before '{}[]'"]>>(),
 ]);
