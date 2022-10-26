@@ -65,4 +65,21 @@ describe("validateArray", () => {
       expect(parse(value)).not.toThrow();
     }
   });
+
+  it("rejects invalud values for a two-dimensional array of primitives", () => {
+    const parse = createParseFunction(`number[][] <positive>`);
+    const numberArrays = [
+      [
+        [0, 1],
+        [1, "5"],
+      ],
+      [1, 2, 3],
+      [[-1, 0]],
+      [[[-1, 0]]],
+    ];
+
+    for (const value of numberArrays) {
+      expect(parse(value)).toThrow();
+    }
+  });
 });
