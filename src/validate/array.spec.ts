@@ -47,4 +47,22 @@ describe("validateArray", () => {
       expect(parse(value)).toThrow();
     }
   });
+
+  it("accepts a two-dimensional array of primitives of the correct type", () => {
+    const parse = createParseFunction(`number[][]`);
+    const numberArrays = [
+      [
+        [0, 1],
+        [1, 1],
+        [1, 0],
+        [0, 0],
+      ],
+      [],
+      [[9999, 23123]],
+    ];
+
+    for (const value of numberArrays) {
+      expect(parse(value)).not.toThrow();
+    }
+  });
 });

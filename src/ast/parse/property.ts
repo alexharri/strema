@@ -1,4 +1,5 @@
 import { PropertyNode, ValueNode } from "../../types/Ast";
+import { callNTimes } from "../../validate/utils/callNTimes";
 import { ParserState } from "../state/ParserState";
 import { TokenType } from "../token";
 import { parseDefaultValue } from "./defaultValue";
@@ -15,36 +16,42 @@ function parseKey(state: ParserState): string {
   return state.token();
 }
 
-function parseIsArray(state: ParserState) {
-  let isArray: boolean;
+/**
+ * Parses array notation to determine the dimension of the array.
+ *
+ *  - `[]` resolves to 1
+ *  - `[][]` resolves to 2
+ *
+ * If there is no array notation, 0 is returned
+ */
+function parseArrayDimension(state: ParserState) {
+  let dimension = 0;
 
-  if (state.atDelimeter("[")) {
+  while (state.atDelimeter("[")) {
     state.nextToken();
     if (!state.atDelimeter("]")) {
       throw new Error(`Expected ']'`);
     }
     state.nextToken();
 
-    isArray = true;
-  } else {
-    isArray = false;
+    dimension++;
   }
 
-  return isArray;
+  return dimension;
 }
 
 export function parseArrayableValueAndRules(state: ParserState): ValueNode {
-  const value = parseValue(state);
-  const isArray = parseIsArray(state);
+  let value = parseValue(state);
+  const arrayDimension = parseArrayDimension(state);
 
   if (value.type === "primitive") {
     value.rules = parseRules(state, value.valueType);
     value.defaultValue = parseDefaultValue(state, value.valueType);
   }
 
-  if (isArray) {
-    return { type: "array", value };
-  }
+  callNTimes(arrayDimension, () => {
+    value = { type: "array", value };
+  });
 
   return value;
 }
