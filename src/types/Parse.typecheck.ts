@@ -100,7 +100,7 @@ it("parses arrays of objects as properties", () => [
   eq<Parse<`{ a: { b: number }[] }`>, { a: { b: number | null }[] }>(),
 
   // Named array syntax
-  eq<Parse<`{ a: { b: number }[] }`>, { a: Array<{ b: number | null }> }>(),
+  eq<Parse<`{ a: { b: number }[] }`>, { a: { b: number | null }[] }>(),
 ]);
 
 it("parses nested object properties", () => [
