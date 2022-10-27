@@ -46,7 +46,7 @@ export function parseRecord(state: ParserState): RecordNode {
 
   state.nextToken();
 
-  const value = parseArrayableValueAndRules(state);
+  const value = parseArrayableValueAndRules(state, { optional: false });
 
   if (!state.atDelimeter(">")) {
     throw new Error(`Expected '>', got '${state.token()}'`);

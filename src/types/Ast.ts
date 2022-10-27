@@ -5,6 +5,7 @@ export interface PrimitiveNode {
   type: "primitive";
   valueType: Primitive;
   rules: Rule[];
+  optional: boolean;
   defaultValue: unknown;
 }
 
@@ -17,6 +18,7 @@ export interface PropertyNode {
 export interface ObjectNode {
   type: "object";
   properties: PropertyNode[];
+  optional: boolean;
 }
 
 export interface RecordNode {

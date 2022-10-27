@@ -14,7 +14,7 @@ export function validateValue(
   const { type } = valueSpec;
   switch (type) {
     case "object": {
-      const err = validateObject(value, valueSpec.properties, ctx);
+      const err = validateObject(value, valueSpec, ctx);
       if (err) return err;
       break;
     }

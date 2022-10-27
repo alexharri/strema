@@ -14,6 +14,7 @@ const delimeters = new Set([
   ",",
   "=",
   '"',
+  "?",
 ]);
 const whitespace = new Set([" ", "\t", "\n"]);
 

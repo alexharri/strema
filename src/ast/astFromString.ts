@@ -5,7 +5,9 @@ import { TokenType } from "./token";
 
 export function astFromString(s: string): Ast {
   const state = new ParserState(s);
+
   const out = parseObject(state);
+  out.optional = false;
 
   if (state.tokenType() !== TokenType.None) {
     throw new Error("Expected end of template");

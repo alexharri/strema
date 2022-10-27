@@ -1,16 +1,16 @@
 import { compileSchema } from "../compile/compileSchema";
 
 describe("object", () => {
-  it("always accepts an empty object", () => {
+  it("does not accept an empty object if there are required fields", () => {
     const schema = compileSchema(
       `{ a: string; b: number = 1; c: { d: string }; e: number[]; }`
     );
 
-    expect(() => schema.parseSync({})).not.toThrow();
+    expect(() => schema.parseSync({})).toThrow("Field 'a' is required");
   });
 
-  it("initializes a primitive property that is not provided with null", () => {
-    const schema = compileSchema(`{ a: string }`);
+  it("initializes an optional primitive property that is not provided with null", () => {
+    const schema = compileSchema(`{ a?: string }`);
 
     const parsed = schema.parseSync({});
 
@@ -33,8 +33,16 @@ describe("object", () => {
     expect(parsed.a).toEqual([]);
   });
 
-  it("initializes nested object properties that are not provided", () => {
+  it("requires object properties that have required primitive fields", () => {
     const schema = compileSchema(`{ a: { b: string; } }`);
+
+    const parse = () => schema.parseSync({});
+
+    expect(parse).toThrow("Field 'a' is required");
+  });
+
+  it("initializes optional fields of object properties that are not provided", () => {
+    const schema = compileSchema(`{ a: { b?: string; } }`);
 
     const parsed = schema.parseSync({});
 

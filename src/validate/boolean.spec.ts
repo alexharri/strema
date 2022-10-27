@@ -13,7 +13,18 @@ describe("validateBoolean", () => {
     }
   });
 
-  it("accepts null or undefined values", () => {
+  it("rejects null or undefined values", () => {
+    const values = [null, undefined];
+
+    for (const value of values) {
+      expect(parse(value)).toThrow("Field 'value' is required");
+    }
+  });
+
+  it("accepts null or undefined values if optional", () => {
+    const schema = compileSchema(`{ value?: boolean; }`);
+    const parse = (value: unknown) => () => schema.parseSync({ value });
+
     const values = [null, undefined];
 
     for (const value of values) {
@@ -32,7 +43,7 @@ describe("validateBoolean", () => {
   });
 
   it("returns null if no default is present and the value is null or undefined", () => {
-    const schema = compileSchema(`{ value: boolean; }`);
+    const schema = compileSchema(`{ value?: boolean; }`);
     const values = [null, undefined];
 
     for (const value of values) {
@@ -43,7 +54,7 @@ describe("validateBoolean", () => {
   });
 
   it("returns the default value for a boolean", () => {
-    const schema = compileSchema(`{ value: boolean = true; }`);
+    const schema = compileSchema(`{ value?: boolean = true; }`);
 
     const { value } = schema.parseSync({ value: null });
 

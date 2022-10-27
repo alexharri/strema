@@ -6,14 +6,31 @@ import { parseDefaultValue } from "./defaultValue";
 import { parseRules } from "./rules";
 import { parseValue } from "./value";
 
-function parseKey(state: ParserState): string {
+function parseKey(state: ParserState): [key: string, optional: boolean] {
   if (state.tokenType() === TokenType.None) {
     throw new Error(`Unexpected end of template`);
   }
   if (state.tokenType() !== TokenType.Symbol) {
     throw new Error(`Unexpected token '${state.token()}'`);
   }
-  return state.token();
+  const key = state.token();
+
+  state.nextToken();
+
+  let optional = false;
+
+  if (state.atDelimeter("?")) {
+    optional = true;
+    state.nextToken();
+  }
+
+  if (!state.atDelimeter(":")) {
+    throw new Error(`Expected ':'`);
+  }
+
+  state.nextToken();
+
+  return [key, optional];
 }
 
 /**
@@ -40,13 +57,19 @@ function parseArrayDimension(state: ParserState) {
   return dimension;
 }
 
-export function parseArrayableValueAndRules(state: ParserState): ValueNode {
+export function parseArrayableValueAndRules(
+  state: ParserState,
+  { optional }: { optional: boolean }
+): ValueNode {
   let value = parseValue(state);
   const arrayDimension = parseArrayDimension(state);
 
   if (value.type === "primitive") {
     value.rules = parseRules(state, value.valueType);
     value.defaultValue = parseDefaultValue(state, value.valueType);
+    value.optional = optional;
+  } else if (optional) {
+    throw new Error(`Type '${value.type} cannot be optional'`);
   }
 
   callNTimes(arrayDimension, () => {
@@ -57,17 +80,9 @@ export function parseArrayableValueAndRules(state: ParserState): ValueNode {
 }
 
 export function parseProperty(state: ParserState): PropertyNode {
-  const key = parseKey(state);
+  const [key, optional] = parseKey(state);
 
-  state.nextToken();
-
-  if (!state.atDelimeter(":")) {
-    throw new Error(`Expected ':'`);
-  }
-
-  state.nextToken();
-
-  const value = parseArrayableValueAndRules(state);
+  const value = parseArrayableValueAndRules(state, { optional });
 
   const property: PropertyNode = { type: "property", key, value };
 

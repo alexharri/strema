@@ -22,6 +22,6 @@ export type NumberRule =
   | NumberMinRule
   | NumberMaxRule;
 
-export type Rule = StringRule | NumberRule;
+export type Rule = StringRule | NumberRule | BooleanRule;
 
 export type RuleType = Rule["type"];
