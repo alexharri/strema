@@ -54,7 +54,7 @@ type FindValue<T extends string, Nullable extends boolean> =
     //    FindValue<`{}`>[][] -> {}[][]
     //
     T extends `${infer Before}[]`
-    ? ErrorIfOptional<FindValue<Before, false>[], Nullable>
+    ? MaybeOptional<FindValue<Before, false>[], Nullable>
     : //
     // Array of primitives (with rules)
     T extends `${infer Token}[]<${string}>`

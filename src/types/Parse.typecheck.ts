@@ -23,7 +23,9 @@ it("parses optional fields", () => [
   eq<Parse<`{ a?: string }`>, { a: string | null }>(),
   eq<Parse<`{ a: { b?: string } }`>, { a: { b: string | null } }>(),
   eq<Parse<`{ a?: boolean }`>, { a: boolean | null }>(),
-  eq<Parse<`{ a?: number <int> }`>, { a: number | null }>(),
+  eq<Parse<`{ a?: number }`>, { a: number | null }>(),
+  eq<Parse<`{ a?: number[] }`>, { a: number[] | null }>(),
+  eq<Parse<`{ a?: number[] <int> }`>, { a: number[] | null }>(),
   eq<Parse<`{ a?: {} }`>, { a: {} | null }>(),
   eq<Parse<`{ a?: { b: string } }`>, { a: { b: string } | null }>(),
   eq<Parse<`{ a?: { b?: string } }`>, { a: { b: string | null } | null }>(),
@@ -36,20 +38,7 @@ it("makes optional fields always present if a default value is provided", () => 
   eq<Parse<`{ a?: number = 42 }`>, { a: number }>(),
 ]);
 
-it("does not support optional array or record record properties", () => [
-  eq<
-    Parse<`{ a?: number[] }`>,
-    {
-      a: CompileError<
-        [
-          "Failed to parse value of property 'a'",
-          "Type cannot be optional",
-          number[]
-        ]
-      >;
-    }
-  >(),
-
+it("does not support optional record properties", () => [
   eq<
     Parse<`{ a?: Record<string, string> }`>,
     {

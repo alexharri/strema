@@ -1,3 +1,4 @@
+import { enforceExhaustive } from "../../switch";
 import { PropertyNode, ValueNode } from "../../types/Ast";
 import { callNTimes } from "../../validate/utils/callNTimes";
 import { ParserState } from "../state/ParserState";
@@ -67,22 +68,26 @@ export function parseArrayableValueAndRules(
   if (value.type === "primitive") {
     value.rules = parseRules(state, value.valueType);
     value.defaultValue = parseDefaultValue(state, value.valueType);
-    value.optional = optional;
-  } else if (optional) {
-    switch (value.type) {
-      case "object":
-        value.optional ||= optional;
-        break;
-      case "array":
-      case "record":
-      default:
-        throw new Error(`Type '${value.type} cannot be optional'`);
-    }
   }
 
   callNTimes(arrayDimension, () => {
-    value = { type: "array", value };
+    value = { type: "array", value, optional: false };
   });
+
+  if (optional) {
+    const { type } = value;
+    switch (type) {
+      case "object":
+      case "array":
+      case "primitive":
+        value.optional = true;
+        break;
+      case "record":
+        throw new Error(`Type '${type} cannot be optional'`);
+      default:
+        enforceExhaustive(type);
+    }
+  }
 
   return value;
 }

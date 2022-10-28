@@ -30,6 +30,7 @@ export interface RecordNode {
 export interface ArrayNode {
   type: "array";
   value: ValueNode;
+  optional: boolean;
 }
 
 export type ValueNode = PrimitiveNode | ArrayNode | ObjectNode | RecordNode;
