@@ -2,7 +2,6 @@ import { enforceExhaustive } from "../../switch";
 import { NumberMaxRule, NumberMinRule, NumberRule } from "../../types/Rule";
 import { ValidationContext } from "../../types/ValidationContext";
 import { ValidationError } from "../ValidationError";
-import { validateRequired } from "./required";
 
 function validateInt(
   ctx: ValidationContext,
@@ -65,8 +64,6 @@ export function validateNumberRule(
 ): ValidationError | null {
   const { type } = rule;
   switch (type) {
-    case "required":
-      return validateRequired(ctx, value);
     case "int":
       return validateInt(ctx, value);
     case "positive":

@@ -41,6 +41,14 @@ describe("object", () => {
     expect(parse).toThrow("Field 'a' is required");
   });
 
+  it("does not require optional object properties that have required primitive fields", () => {
+    const schema = compileSchema(`{ a?: { b: string; } }`);
+
+    const parse = () => schema.parseSync({});
+
+    expect(parse).not.toThrow();
+  });
+
   it("initializes optional fields of object properties that are not provided", () => {
     const schema = compileSchema(`{ a: { b?: string; } }`);
 

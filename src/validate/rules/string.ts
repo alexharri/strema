@@ -3,7 +3,6 @@ import { StringRule } from "../../types/Rule";
 import { ValidationContext } from "../../types/ValidationContext";
 import { emailRegex, uuidRegex } from "../utils/regex";
 import { ValidationError } from "../ValidationError";
-import { validateRequired } from "./required";
 
 function validateEmail(
   ctx: ValidationContext,
@@ -81,8 +80,6 @@ export function validateStringRule(
 ): ValidationError | null {
   const { type } = rule;
   switch (type) {
-    case "required":
-      return validateRequired(ctx, value);
     case "email":
       return validateEmail(ctx, value);
     case "min":

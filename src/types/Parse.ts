@@ -41,7 +41,7 @@ type FindValue<T extends string, Nullable extends boolean> =
     : //
     // Object primitive
     T extends `{${infer R}}`
-    ? ErrorIfOptional<_Parse<`{${R}}`>, Nullable>
+    ? MaybeOptional<_Parse<`{${R}}`>, Nullable>
     : //
     // One of:
     //  1. Array of primitives without rules (such as `string[]`)
@@ -54,7 +54,7 @@ type FindValue<T extends string, Nullable extends boolean> =
     //    FindValue<`{}`>[][] -> {}[][]
     //
     T extends `${infer Before}[]`
-    ? MaybeOptional<FindValue<Before, false>[], Nullable>
+    ? ErrorIfOptional<FindValue<Before, false>[], Nullable>
     : //
     // Array of primitives (with rules)
     T extends `${infer Token}[]<${string}>`

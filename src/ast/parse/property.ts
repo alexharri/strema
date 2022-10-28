@@ -69,7 +69,15 @@ export function parseArrayableValueAndRules(
     value.defaultValue = parseDefaultValue(state, value.valueType);
     value.optional = optional;
   } else if (optional) {
-    throw new Error(`Type '${value.type} cannot be optional'`);
+    switch (value.type) {
+      case "object":
+        value.optional ||= optional;
+        break;
+      case "array":
+      case "record":
+      default:
+        throw new Error(`Type '${value.type} cannot be optional'`);
+    }
   }
 
   callNTimes(arrayDimension, () => {
