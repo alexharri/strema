@@ -15,7 +15,7 @@ export function compileSchema<T extends string>(template: T): Schema<Parse<T>> {
         throw new Error(`Expected object, got '${typeAsString(value)}'`);
       }
 
-      const err = validateObject(value, ast.properties, { path: [] });
+      const err = validateObject(value, ast, { path: [] });
       if (err) {
         throw err;
       }

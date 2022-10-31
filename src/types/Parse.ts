@@ -22,20 +22,26 @@ type ParseToken<T extends string> = T extends Primitive
       [`Expected one of [${StringJoin<PrimitivesTuple, ", ">}] but got '${T}'`]
     >;
 
-type Optional<T, NotNull = false> = T extends Err<infer E>
+type MaybeOptional<T, Nullable extends boolean> = T extends Err<infer E>
   ? Err<E>
-  : NotNull extends true
+  : Nullable extends false
   ? T
   : T | null;
 
-type FindValue<T extends string, NotNull = false> =
+type ErrorIfOptional<T, Nullable extends boolean> = T extends Err<infer E>
+  ? Err<E>
+  : Nullable extends true
+  ? Err<["Type cannot be optional", T]>
+  : T;
+
+type FindValue<T extends string, Nullable extends boolean> =
   // Record
   T extends `Record<${infer K extends "string" | "number"},${infer R}>`
-    ? Record<TokenToValue[K], FindValue<R, true>>
+    ? ErrorIfOptional<Record<TokenToValue[K], FindValue<R, false>>, Nullable>
     : //
     // Object primitive
     T extends `{${infer R}}`
-    ? _Parse<`{${R}}`>
+    ? MaybeOptional<_Parse<`{${R}}`>, Nullable>
     : //
     // One of:
     //  1. Array of primitives without rules (such as `string[]`)
@@ -48,11 +54,11 @@ type FindValue<T extends string, NotNull = false> =
     //    FindValue<`{}`>[][] -> {}[][]
     //
     T extends `${infer Before}[]`
-    ? FindValue<Before, true>[]
+    ? MaybeOptional<FindValue<Before, false>[], Nullable>
     : //
     // Array of primitives (with rules)
     T extends `${infer Token}[]<${string}>`
-    ? FindValue<Token, true>[]
+    ? MaybeOptional<FindValue<Token, false>[], Nullable>
     : //
     // Primitive with rules and a default
     T extends `${infer Token}<${string}>=${string}`
@@ -64,18 +70,25 @@ type FindValue<T extends string, NotNull = false> =
     : //
     // Primitive with rules
     T extends `${infer Token}<${string}>`
-    ? Optional<ParseToken<Token>, NotNull>
+    ? MaybeOptional<ParseToken<Token>, Nullable>
     : //
       // When none of the above matched, we expect to find just a primitive
-      Optional<ParseToken<T>, NotNull>;
+      MaybeOptional<ParseToken<T>, Nullable>;
 
-type KeyValue<T extends string> = T extends `${infer K}:${infer Rest}`
-  ? {
-      key: K;
-      value: FindValue<TrimLeft<Rest>> extends Err<infer E>
-        ? Err<[`Failed to parse value of property '${K}'`, ...E]>
-        : FindValue<TrimLeft<Rest>>;
-    }
+type KeyValue<T extends string> = T extends `${infer _K}:${infer Rest}`
+  ? _K extends `${infer K}?`
+    ? {
+        key: K;
+        value: FindValue<TrimLeft<Rest>, true> extends Err<infer E>
+          ? Err<[`Failed to parse value of property '${K}'`, ...E]>
+          : FindValue<TrimLeft<Rest>, true>;
+      }
+    : {
+        key: _K;
+        value: FindValue<TrimLeft<Rest>, false> extends Err<infer E>
+          ? Err<[`Failed to parse value of property '${_K}'`, ...E]>
+          : FindValue<TrimLeft<Rest>, false>;
+      }
   : Err<[`Expected key-value property, got '${T}'`]>;
 
 export type ParseProperty<T extends string> = KeyValue<T> extends {

@@ -2,6 +2,7 @@ import { typeAsString } from "../format/typeAsString";
 import { ArrayNode } from "../types/Ast";
 import { ValidationContext } from "../types/ValidationContext";
 import { isNullOrUndefined } from "./utils/isNullOrUndefined";
+import { stringifyPropertyPath } from "./utils/stringifyPropertyPath";
 import { ValidationError } from "./ValidationError";
 import { validateValue } from "./value";
 
@@ -11,6 +12,13 @@ export function validateArray(
   ctx: ValidationContext
 ): ValidationError | null {
   if (isNullOrUndefined(arr)) {
+    if (!spec.optional) {
+      return new ValidationError({
+        message: `Field '${stringifyPropertyPath(ctx.path)}' is required`,
+        value: arr,
+        ctx,
+      });
+    }
     return null;
   }
 

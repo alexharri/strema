@@ -1,3 +1,4 @@
+import { enforceExhaustive } from "../../switch";
 import { PropertyNode, ValueNode } from "../../types/Ast";
 import { callNTimes } from "../../validate/utils/callNTimes";
 import { ParserState } from "../state/ParserState";
@@ -6,14 +7,31 @@ import { parseDefaultValue } from "./defaultValue";
 import { parseRules } from "./rules";
 import { parseValue } from "./value";
 
-function parseKey(state: ParserState): string {
+function parseKey(state: ParserState): [key: string, optional: boolean] {
   if (state.tokenType() === TokenType.None) {
     throw new Error(`Unexpected end of template`);
   }
   if (state.tokenType() !== TokenType.Symbol) {
     throw new Error(`Unexpected token '${state.token()}'`);
   }
-  return state.token();
+  const key = state.token();
+
+  state.nextToken();
+
+  let optional = false;
+
+  if (state.atDelimeter("?")) {
+    optional = true;
+    state.nextToken();
+  }
+
+  if (!state.atDelimeter(":")) {
+    throw new Error(`Expected ':'`);
+  }
+
+  state.nextToken();
+
+  return [key, optional];
 }
 
 /**
@@ -40,7 +58,10 @@ function parseArrayDimension(state: ParserState) {
   return dimension;
 }
 
-export function parseArrayableValueAndRules(state: ParserState): ValueNode {
+export function parseArrayableValueAndRules(
+  state: ParserState,
+  { optional }: { optional: boolean }
+): ValueNode {
   let value = parseValue(state);
   const arrayDimension = parseArrayDimension(state);
 
@@ -50,24 +71,40 @@ export function parseArrayableValueAndRules(state: ParserState): ValueNode {
   }
 
   callNTimes(arrayDimension, () => {
-    value = { type: "array", value };
+    value = { type: "array", value, optional: false };
   });
+
+  if (optional) {
+    const { type } = value;
+    switch (type) {
+      case "object":
+      case "array":
+      case "primitive":
+        value.optional = true;
+        break;
+      case "record":
+        throw new Error(`Type '${type} cannot be optional'`);
+      default:
+        enforceExhaustive(type);
+    }
+  }
+
+  const requiredPrimitiveHasDefaultValue =
+    value.type === "primitive" &&
+    !value.optional &&
+    value.defaultValue !== null;
+
+  if (requiredPrimitiveHasDefaultValue) {
+    throw new Error(`Non-optional fields cannot have default values.`);
+  }
 
   return value;
 }
 
 export function parseProperty(state: ParserState): PropertyNode {
-  const key = parseKey(state);
+  const [key, optional] = parseKey(state);
 
-  state.nextToken();
-
-  if (!state.atDelimeter(":")) {
-    throw new Error(`Expected ':'`);
-  }
-
-  state.nextToken();
-
-  const value = parseArrayableValueAndRules(state);
+  const value = parseArrayableValueAndRules(state, { optional });
 
   const property: PropertyNode = { type: "property", key, value };
 

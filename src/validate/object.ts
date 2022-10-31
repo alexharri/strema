@@ -1,17 +1,25 @@
 import { typeAsString } from "../format/typeAsString";
-import { PropertyNode } from "../types/Ast";
+import { ObjectNode } from "../types/Ast";
 import { ValidationContext } from "../types/ValidationContext";
 import { isNullOrUndefined } from "./utils/isNullOrUndefined";
 import { isPlainObject } from "./utils/isPlainObject";
+import { stringifyPropertyPath } from "./utils/stringifyPropertyPath";
 import { ValidationError } from "./ValidationError";
 import { validateValue } from "./value";
 
 export function validateObject(
   obj: unknown,
-  properties: PropertyNode[],
+  spec: ObjectNode,
   ctx: ValidationContext
 ): ValidationError | null {
   if (isNullOrUndefined(obj)) {
+    if (!spec.optional && spec.hasRequiredProperties) {
+      return new ValidationError({
+        message: `Field '${stringifyPropertyPath(ctx.path)}' is required`,
+        value: obj,
+        ctx,
+      });
+    }
     return null;
   }
 
@@ -24,7 +32,7 @@ export function validateObject(
     });
   }
 
-  for (const property of properties) {
+  for (const property of spec.properties) {
     ctx.path.push(property.key);
 
     const value = (obj as Record<string, unknown>)[property.key];

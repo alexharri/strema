@@ -6,6 +6,7 @@ import { validateBoolean } from "./boolean";
 import { validateNumber } from "./number";
 import { validateString } from "./string";
 import { isNullOrUndefined } from "./utils/isNullOrUndefined";
+import { stringifyPropertyPath } from "./utils/stringifyPropertyPath";
 import { ValidationError } from "./ValidationError";
 
 export function validatePrimitive(
@@ -13,8 +14,14 @@ export function validatePrimitive(
   spec: PrimitiveNode,
   ctx: ValidationContext
 ): ValidationError | null {
-  if (isNullOrUndefined(value)) {
-    value = spec.defaultValue;
+  value ??= spec.defaultValue;
+
+  if (!spec.optional && isNullOrUndefined(value)) {
+    return new ValidationError({
+      message: `Field '${stringifyPropertyPath(ctx.path)}' is required`,
+      ctx,
+      value,
+    });
   }
 
   const { valueType } = spec;

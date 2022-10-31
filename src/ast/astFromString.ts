@@ -5,6 +5,7 @@ import { TokenType } from "./token";
 
 export function astFromString(s: string): Ast {
   const state = new ParserState(s);
+
   const out = parseObject(state);
 
   if (state.tokenType() !== TokenType.None) {

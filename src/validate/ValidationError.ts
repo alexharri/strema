@@ -1,15 +1,5 @@
 import { ValidationContext } from "../types/ValidationContext";
-
-function stringifyPath(path: string[]) {
-  let out = "";
-  for (const part of path) {
-    if (out && !part.startsWith("[")) {
-      out += ".";
-    }
-    out += part;
-  }
-  return out;
-}
+import { stringifyPropertyPath } from "./utils/stringifyPropertyPath";
 
 interface Options {
   message: string;
@@ -40,7 +30,7 @@ export class ValidationError extends Error {
   }
 
   setPath(path: string[]) {
-    this.path = stringifyPath(path);
+    this.path = stringifyPropertyPath(path);
     this.pathParts = path;
     return this;
   }
