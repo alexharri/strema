@@ -13,7 +13,12 @@ export function parseObject(state: ParserState): ObjectNode {
   if (state.atDelimeter("}")) {
     // Immediately closed object
     state.nextToken();
-    return { type: "object", properties: [], optional: true };
+    return {
+      type: "object",
+      properties: [],
+      optional: false,
+      hasRequiredProperties: false,
+    };
   }
 
   const properties = parseProperties(state);
@@ -24,20 +29,27 @@ export function parseObject(state: ParserState): ObjectNode {
 
   state.nextToken();
 
-  const anyRequiredProperty = properties.find((property) => {
+  const hasRequiredProperties = !!properties.find((property) => {
     const type = property.value.type;
     switch (type) {
-      case "array":
       case "record":
         return false;
+      case "object": {
+        const { optional, hasRequiredProperties } = property.value;
+        return !optional && hasRequiredProperties;
+      }
+      case "array":
       case "primitive":
-      case "object":
         return !property.value.optional;
       default:
         enforceExhaustive(type);
     }
   });
-  const optional = !anyRequiredProperty;
 
-  return { type: "object", properties, optional };
+  return {
+    type: "object",
+    properties,
+    optional: false, // Optionality is set later in 'parseProperty'
+    hasRequiredProperties,
+  };
 }

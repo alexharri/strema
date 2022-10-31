@@ -1,3 +1,4 @@
+import { typeAsString } from "../format/typeAsString";
 import { enforceExhaustive } from "../switch";
 import { ArrayNode, ObjectNode, RecordNode, ValueNode } from "../types/Ast";
 import { isNullOrUndefined } from "../validate/utils/isNullOrUndefined";
@@ -9,17 +10,18 @@ function copyProperty(value: unknown, ast: ValueNode): unknown {
       if (isNullOrUndefined(value)) return ast.defaultValue;
       return value;
     case "object":
-      return copyObject(value || {}, ast);
+      return copyObject(value, ast);
     case "array":
-      return copyArray((value as unknown[]) || [], ast);
+      return copyArray(value as unknown[] | null, ast);
     case "record":
-      return copyRecord((value as unknown[]) || [], ast);
+      return copyRecord(value || {}, ast);
     default:
       enforceExhaustive(type, "Unexpected type");
   }
 }
 
-function copyArray(array: unknown[], ast: ArrayNode): unknown {
+function copyArray(array: unknown[] | null, ast: ArrayNode): unknown {
+  if (!array) return null;
   return array.map((value) => copyProperty(value, ast.value));
 }
 
@@ -27,6 +29,15 @@ function copyArray(array: unknown[], ast: ArrayNode): unknown {
  * Assumes that the object has already been validated to match the AST.
  */
 export function copyObject(object: unknown, ast: ObjectNode): unknown {
+  if (isNullOrUndefined(object)) {
+    if (ast.optional) return null;
+    if (!ast.hasRequiredProperties) {
+      object = {};
+    } else {
+      throw new Error(`Expected object, got '${typeAsString(object)}'`);
+    }
+  }
+
   const from = object as Record<string, unknown>;
   const to: Record<string, unknown> = {};
 

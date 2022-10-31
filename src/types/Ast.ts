@@ -19,6 +19,7 @@ export interface ObjectNode {
   type: "object";
   properties: PropertyNode[];
   optional: boolean;
+  hasRequiredProperties: boolean;
 }
 
 export interface RecordNode {

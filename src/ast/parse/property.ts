@@ -89,6 +89,15 @@ export function parseArrayableValueAndRules(
     }
   }
 
+  const requiredPrimitiveHasDefaultValue =
+    value.type === "primitive" &&
+    !value.optional &&
+    value.defaultValue !== null;
+
+  if (requiredPrimitiveHasDefaultValue) {
+    throw new Error(`Non-optional fields cannot have default values.`);
+  }
+
   return value;
 }
 

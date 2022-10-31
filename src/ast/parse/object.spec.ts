@@ -8,14 +8,14 @@ describe("parseObject", () => {
     expect(() => parseObject(state)).not.toThrow();
   });
 
-  it("considers the object optional if there are no required properties", () => {
+  it("correctly finds when there are no required properties", () => {
     const templates = [
       `{ a?: string; }`,
       `{ a: {} }`,
-      `{ a: string[] }`,
+      `{ a?: string[] }`,
       `{ a: Record<string, number> }`,
       `{ a: { b?: number } }`,
-      `{ a?: string; b: {}; c: number[]; d: Record<string, { e: number; }> }`,
+      `{ a?: string; b: {}; c?: number[]; d: Record<string, { e: number; }> }`,
     ];
 
     for (const template of templates) {
@@ -23,11 +23,11 @@ describe("parseObject", () => {
 
       const object = parseObject(state);
 
-      expect(object.optional).toEqual(true);
+      expect(object.hasRequiredProperties).toEqual(false);
     }
   });
 
-  it("considers the object required if there is a required property", () => {
+  it("correctly finds when there are required properties", () => {
     const templates = [`{ a: string; }`, `{ a: { b: { c: string } }; }`];
 
     for (const template of templates) {
@@ -35,7 +35,7 @@ describe("parseObject", () => {
 
       const object = parseObject(state);
 
-      expect(object.optional).toEqual(false);
+      expect(object.hasRequiredProperties).toEqual(true);
     }
   });
 });

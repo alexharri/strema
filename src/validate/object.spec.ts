@@ -3,7 +3,7 @@ import { compileSchema } from "../compile/compileSchema";
 describe("object", () => {
   it("does not accept an empty object if there are required fields", () => {
     const schema = compileSchema(
-      `{ a: string; b: number = 1; c: { d: string }; e: number[]; }`
+      `{ a: string; b?: number = 1; c: { d: string }; e: number[]; }`
     );
 
     expect(() => schema.parseSync({})).toThrow("Field 'a' is required");
@@ -17,42 +17,50 @@ describe("object", () => {
     expect(parsed.a).toEqual(null);
   });
 
-  it("initializes object properties that are not provided", () => {
+  it("throws if required object properties with no properties are not provided", () => {
     const schema = compileSchema(`{ a: {} }`);
-
-    const parsed = schema.parseSync({});
-
-    expect(parsed.a).toEqual({});
-  });
-
-  it("initializes array properties that are not provided", () => {
-    const schema = compileSchema(`{ a: number[] }`);
-
-    const parsed = schema.parseSync({});
-
-    expect(parsed.a).toEqual([]);
-  });
-
-  it("requires object properties that have required primitive fields", () => {
-    const schema = compileSchema(`{ a: { b: string; } }`);
 
     const parse = () => schema.parseSync({});
 
     expect(parse).toThrow("Field 'a' is required");
   });
 
-  it("does not require optional object properties that have required primitive fields", () => {
-    const schema = compileSchema(`{ a?: { b: string; } }`);
+  it("throws if required object properties with required properties are not provided", () => {
+    const schema = compileSchema(`{ a: { value: number } }`);
 
     const parse = () => schema.parseSync({});
 
-    expect(parse).not.toThrow();
+    expect(parse).toThrow("Field 'a' is required");
+  });
+
+  it("initializes optional object properties with required properties that are not provided to null", () => {
+    const schema = compileSchema(`{ a?: { value: number } }`);
+
+    const parsed = schema.parseSync({});
+
+    expect(parsed.a).toEqual(null);
+  });
+
+  it("requires non-optional array properties to be provided", () => {
+    const schema = compileSchema(`{ a: number[] }`);
+
+    const parse = () => schema.parseSync({});
+
+    expect(parse).toThrow("Field 'a' is required");
+  });
+
+  it("initializes optional array properties that are not provided to null", () => {
+    const schema = compileSchema(`{ a?: number[] }`);
+
+    const parsed = schema.parseSync({});
+
+    expect(parsed.a).toEqual(null);
   });
 
   it("initializes optional fields of object properties that are not provided", () => {
     const schema = compileSchema(`{ a: { b?: string; } }`);
 
-    const parsed = schema.parseSync({});
+    const parsed = schema.parseSync({ a: {} });
 
     expect(parsed.a.b).toEqual(null);
   });

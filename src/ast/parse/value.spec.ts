@@ -53,7 +53,8 @@ describe("parseValue", () => {
     const expectedValue: ValueNode = {
       type: "object",
       properties: [],
-      optional: true,
+      optional: false,
+      hasRequiredProperties: false,
     };
 
     const value = parseObject(state);
