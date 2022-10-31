@@ -50,7 +50,12 @@ describe("parseValue", () => {
 
   it("parses objects by calling 'parseObject'", () => {
     const state = new ParserState(`{}`);
-    const expectedValue: ValueNode = { type: "object", properties: [] };
+    const expectedValue: ValueNode = {
+      type: "object",
+      properties: [],
+      optional: false,
+      hasRequiredProperties: false,
+    };
 
     const value = parseObject(state);
 

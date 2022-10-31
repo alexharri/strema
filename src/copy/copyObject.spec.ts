@@ -21,7 +21,7 @@ describe("copyObject", () => {
   });
 
   it("copies every key, even if not in the original object", () => {
-    const ast = astFromString(`{ a: string; b: number; c: boolean }`);
+    const ast = astFromString(`{ a?: string; b?: number; c?: boolean }`);
 
     const copied = copyObject({}, ast);
 
@@ -40,7 +40,7 @@ describe("copyObject", () => {
   });
 
   it("initializes primitives that are not present with null", () => {
-    const ast = astFromString(`{ a: string; b: number; c: boolean }`);
+    const ast = astFromString(`{ a?: string; b?: number; c?: boolean }`);
 
     const copied: any = copyObject({}, ast);
 
@@ -50,7 +50,7 @@ describe("copyObject", () => {
   });
 
   it("uses the default value when the property is not provided", () => {
-    const ast = astFromString(`{ value: number = 42 }`);
+    const ast = astFromString(`{ value?: number = 42 }`);
 
     const copied: any = copyObject({}, ast);
 
@@ -58,7 +58,7 @@ describe("copyObject", () => {
   });
 
   it("does not override the value with the default if provided", () => {
-    const ast = astFromString(`{ value: number = 42 }`);
+    const ast = astFromString(`{ value?: number = 42 }`);
 
     const copied: any = copyObject({ value: 1 }, ast);
 
@@ -66,7 +66,7 @@ describe("copyObject", () => {
   });
 
   it("does not override a falsy value with the default if provided", () => {
-    const ast = astFromString(`{ value: number = 42 }`);
+    const ast = astFromString(`{ value?: number = 42 }`);
 
     const copied: any = copyObject({ value: 0 }, ast);
 
@@ -74,7 +74,7 @@ describe("copyObject", () => {
   });
 
   it("overrides null values with the default", () => {
-    const ast = astFromString(`{ value: number = 42 }`);
+    const ast = astFromString(`{ value?: number = 42 }`);
 
     const copied: any = copyObject({ value: null }, ast);
 
@@ -82,38 +82,38 @@ describe("copyObject", () => {
   });
 
   it("overrides undefined values with the default", () => {
-    const ast = astFromString(`{ value: number = 42 }`);
+    const ast = astFromString(`{ value?: number = 42 }`);
 
     const copied: any = copyObject({ value: undefined }, ast);
 
     expect(copied.value).toEqual(42);
   });
 
-  it("initializes arrays with empty arrays if not provided", () => {
-    const ast = astFromString(`{ ints: number[] }`);
+  it("initializes arrays with null if not provided", () => {
+    const ast = astFromString(`{ ints?: number[] }`);
 
     const copied: any = copyObject({}, ast);
 
-    expect(copied.ints).toEqual([]);
+    expect(copied.ints).toEqual(null);
   });
 
-  it("initializes arrays with empty arrays if null is provided", () => {
-    const ast = astFromString(`{ ints: number[] }`);
+  it("initializes arrays with null if null is provided", () => {
+    const ast = astFromString(`{ ints?: number[] }`);
 
     const copied: any = copyObject({ ints: null }, ast);
 
-    expect(copied.ints).toEqual([]);
+    expect(copied.ints).toEqual(null);
   });
 
-  it("initializes arrays with empty arrays if undefined is provided", () => {
-    const ast = astFromString(`{ ints: number[] }`);
+  it("initializes arrays with null if undefined is provided", () => {
+    const ast = astFromString(`{ ints?: number[] }`);
 
     const copied: any = copyObject({ ints: undefined }, ast);
 
-    expect(copied.ints).toEqual([]);
+    expect(copied.ints).toEqual(null);
   });
 
-  it("initializes objects if not provided", () => {
+  it("initializes empty objects if not provided", () => {
     const ast = astFromString(`{ obj: {} }`);
 
     const copied: any = copyObject({}, ast);
@@ -121,7 +121,7 @@ describe("copyObject", () => {
     expect(copied.obj).toEqual({});
   });
 
-  it("initializes objects if null is provided", () => {
+  it("initializes empty objects if null is provided", () => {
     const ast = astFromString(`{ obj: {} }`);
 
     const copied: any = copyObject({ obj: null }, ast);
@@ -129,7 +129,7 @@ describe("copyObject", () => {
     expect(copied.obj).toEqual({});
   });
 
-  it("initializes objects if undefined is provided", () => {
+  it("initializes empty objects if undefined is provided", () => {
     const ast = astFromString(`{ obj: {} }`);
 
     const copied: any = copyObject({ obj: undefined }, ast);
@@ -137,20 +137,60 @@ describe("copyObject", () => {
     expect(copied.obj).toEqual({});
   });
 
-  it("initializes properties of objects if the object is not provided", () => {
-    const ast = astFromString(`{ obj: { value: number } }`);
+  it("initializes optional objects to null if not provided", () => {
+    const ast = astFromString(`{ obj?: {} }`);
 
     const copied: any = copyObject({}, ast);
 
-    expect(copied.obj).toEqual({ value: null });
+    expect(copied.obj).toEqual(null);
+  });
+
+  it("initializes optional objects to null if null is provided", () => {
+    const ast = astFromString(`{ obj?: {} }`);
+
+    const copied: any = copyObject({ obj: null }, ast);
+
+    expect(copied.obj).toEqual(null);
+  });
+
+  it("initializes optional objects to null if undefined is provided", () => {
+    const ast = astFromString(`{ obj?: {} }`);
+
+    const copied: any = copyObject({ obj: undefined }, ast);
+
+    expect(copied.obj).toEqual(null);
+  });
+
+  it("initializes objects with no required properties if not provided", () => {
+    const ast = astFromString(`{ obj: { value?: number } }`);
+
+    const copied: any = copyObject({}, ast);
+
+    expect(copied.obj.value).toEqual(null);
+  });
+
+  it("initializes objects with no required properties if null is provided", () => {
+    const ast = astFromString(`{ obj: { value?: number } }`);
+
+    const copied: any = copyObject({ obj: null }, ast);
+
+    expect(copied.obj.value).toEqual(null);
+  });
+
+  it("initializes objects with no required properties if undefined is provided", () => {
+    const ast = astFromString(`{ obj: { value?: number } }`);
+
+    const copied: any = copyObject({ obj: undefined }, ast);
+
+    expect(copied.obj.value).toEqual(null);
   });
 
   it("initializes properties of objects with their default values if the object is not provided", () => {
-    const ast = astFromString(`{ obj: { value: number = 42 } }`);
+    const ast = astFromString(`{ obj: { value?: number = 42 } }`);
 
     const copied: any = copyObject({}, ast);
 
-    expect(copied.obj).toEqual({ value: 42 });
+    expect(copied.obj.value).toEqual(42);
   });
 
   it("initializes records to an empty object if not provided", () => {
