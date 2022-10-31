@@ -13,7 +13,7 @@ export function validateObject(
   ctx: ValidationContext
 ): ValidationError | null {
   if (isNullOrUndefined(obj)) {
-    if (!spec.optional) {
+    if (!spec.optional && spec.hasRequiredProperties) {
       return new ValidationError({
         message: `Field '${stringifyPropertyPath(ctx.path)}' is required`,
         value: obj,

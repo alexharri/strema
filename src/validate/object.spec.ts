@@ -17,12 +17,28 @@ describe("object", () => {
     expect(parsed.a).toEqual(null);
   });
 
-  it("throws if required object properties with no properties are not provided", () => {
+  it("does not throw if required object properties with no properties are not provided", () => {
     const schema = compileSchema(`{ a: {} }`);
 
     const parse = () => schema.parseSync({});
 
-    expect(parse).toThrow("Field 'a' is required");
+    expect(parse).not.toThrow();
+  });
+
+  it("does not throw if required object properties with no required properties are not provided", () => {
+    const schema = compileSchema(`{ a: { b?: number } }`);
+
+    const parse = () => schema.parseSync({});
+
+    expect(parse).not.toThrow();
+  });
+
+  it("initializes default values of properties of object properties that are not provided", () => {
+    const schema = compileSchema(`{ a: { b?: number = 42 } }`);
+
+    const parsed = schema.parseSync({});
+
+    expect(parsed.a.b).toEqual(42);
   });
 
   it("throws if required object properties with required properties are not provided", () => {
