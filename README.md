@@ -200,7 +200,7 @@ const schema = compileSchema(`{
 </table>
 
 
-### Object
+### Objects
 
 Objects fields represent a collection of sub-fields (key-value pairs).
 
