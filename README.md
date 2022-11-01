@@ -6,6 +6,7 @@
   Experimental schema builder using TypeScript templates.
 </p>
 
+
 ## Usage
 
 Use `compileSchema` to create a schema.
@@ -41,9 +42,6 @@ const body = schema.parseSync(req.body);
 ```
 
 
-
-
-
 ## Overview
 
 - [Field types](#Field_types)
@@ -62,9 +60,17 @@ const body = schema.parseSync(req.body);
 
 ## Field types
 
+This library supports four field types.
+
+- [Primitives](#Primitives)
+- [Objects](#Objects)
+- [Arrays](#Arrays)
+- [Records](#Records)
+
+
 ### Primitives
 
-This library supports three types of primitives.
+There are three primitive types.
 
 - [String](#String)
 - [Number](#Number)
@@ -76,7 +82,7 @@ This library supports three types of primitives.
 <table>
 <tr>
 <th>Schema</th>
-<th>Parsed type</th>
+<th>TypeScript type</th>
 </tr>
 <tr>
 <td>
@@ -118,7 +124,7 @@ const schema = compileSchema(`{
 <table>
 <tr>
 <th>Schema</th>
-<th>Parsed type</th>
+<th>TypeScript type</th>
 </tr>
 <tr>
 <td>
@@ -169,7 +175,7 @@ A default value of either `true` or `false` can be provided:
 <table>
 <tr>
 <th>Schema</th>
-<th>Parsed type</th>
+<th>TypeScript type</th>
 </tr>
 <tr>
 <td>
@@ -192,7 +198,7 @@ const schema = compileSchema(`{
 
 ## Rules
 
-Primitive values support a number of rules to perform basic validation.
+Primitive types support rules to perform basic validation. Rules are specified inside of `<>` after the type name and before `;` with multiple rules separated by `,`. If the rule takes an argument, provide it inside of `()` after the rule name.
 
 ```tsx
 const schema = compileSchema(`{
@@ -202,9 +208,13 @@ const schema = compileSchema(`{
 }`);
 ```
 
-Some rules take an argument, some not. Multiple rules may be applied to a single value.
+The available rules can be found here:
 
-To apply rules to arrays of primitives, place the rules after the array notation:
+- [String rules](#String_rules)
+- [Number rules](#Number_rules)
+- Booleans do not support rules
+
+Rules may also be applied to arrays (and multidimensional arrays). In those cases, specify the rules after all `[]`
 
 ```tsx
 const schema = compileSchema(`{
@@ -213,4 +223,105 @@ const schema = compileSchema(`{
 }`);
 ```
 
-Rules can not be applied to arrays or objects.
+Rules can not be applied directly to arrays or objects.
+
+
+## Optional fields
+
+By default, all fields are required. To mark a field as optional, add a `?` after the field name:
+
+<table>
+<tr>
+<th>Schema</th>
+<th>TypeScript type</th>
+</tr>
+<tr>
+<td>
+
+```tsx
+const schema = compileSchema(`{
+  description?: string;
+}`);
+```
+</td>
+<td>
+
+```tsx
+{ description: string | null }
+```
+</td>
+</tr>
+</table>
+
+
+### Optional primitive fields
+
+When a primitive field is optional, `null` and `undefined` values are not rejected.
+
+```tsx
+const schema = compileSchema(`{
+  description?: string;
+}`);
+
+const output = schema.parseSync({ description: undefined });
+
+console.log(output);
+//=> { description: null }
+```
+
+
+### Optional array fields
+
+Optional arrays behave in the same way as primitives.
+
+```tsx
+const schema = compileSchema(`{
+  tags?: string[];
+}`);
+
+const output = schema.parseSync({ tags: undefined });
+
+console.log(output);
+//=> { tags: null }
+```
+
+
+### Optional object fields
+
+Object fields behave the same as primitives and arrays, with the exception that object fields with no required fields accept `null` and `undefined`.
+
+```tsx
+const schema = compileSchema(`{
+  options: { notify?: boolean; delay?: number };
+}`);
+
+const output = schema.parseSync({ options: undefined });
+
+console.log(output.options);
+//=> { notify: null, delay: null }
+```
+
+However, if the object is optional, it resolves to `null` when `null` or `undefined` are provided.
+
+```tsx
+const schema = compileSchema(`{
+  options?: { notify?: boolean; delay?: number };
+}`);
+
+const output = schema.parseSync({ options: undefined });
+
+console.log(output.options);
+//=> null
+```
+
+
+### Optional record fields
+
+Records fields are always optional. Using the `?:` optional notation throws an error.
+
+```tsx
+const schema = compileSchema(`{
+  record?: Record<string, string>;
+}`);
+// Throws: Type 'record' cannot be optional
+```
