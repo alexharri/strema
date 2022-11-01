@@ -83,7 +83,7 @@ export function parseArrayableValueAndRules(
         value.optional = true;
         break;
       case "record":
-        throw new Error(`Type '${type} cannot be optional'`);
+        throw new Error(`Type '${type}' cannot be optional`);
       default:
         enforceExhaustive(type);
     }
