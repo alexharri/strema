@@ -93,14 +93,68 @@ There are three primitive types.
 
 ```tsx
 const schema = compileSchema(`{
-  email: string;
+  value: string;
 }`);
 ```
 </td>
 <td>
 
 ```tsx
-{ email: string }
+{ value: string }
+```
+</td>
+</tr>
+
+<tr>
+<td>
+
+```tsx
+// Optional 'value' field
+const schema = compileSchema(`{
+  value?: string;
+}`);
+```
+</td>
+<td>
+
+```tsx
+{ value: string | null }
+```
+</td>
+</tr>
+
+<tr>
+<td>
+
+```tsx
+// Optional 'value' field with default value
+const schema = compileSchema(`{
+  value?: string = "Hello, world";
+}`);
+```
+</td>
+<td>
+
+```tsx
+{ value: string }
+```
+</td>
+</tr>
+
+<tr>
+<td>
+
+```tsx
+// Apply email rule to 'to' field
+const schema = compileSchema(`{
+  to: string <email>;
+}`);
+```
+</td>
+<td>
+
+```tsx
+{ to: string }
 ```
 </td>
 </tr>
@@ -113,14 +167,6 @@ const schema = compileSchema(`{
  - `length(n)` equivalent to `min(n), max(n)`.
  - `email` the string value must be an email address.
  - `uuid` the string value must be a uuid.
-
-A default value can be provided inside of double quotes:
-
-```tsx
-const schema = compileSchema(`{
-  category: string <min(3)> = "other";
-}`);
-```
 
 
 #### Number
@@ -135,14 +181,68 @@ const schema = compileSchema(`{
 
 ```tsx
 const schema = compileSchema(`{
-  width: number;
+  value: number;
 }`);
 ```
 </td>
 <td>
 
 ```tsx
-{ width: number }
+{ value: number }
+```
+</td>
+</tr>
+
+<tr>
+<td>
+
+```tsx
+// Optional 'value' field
+const schema = compileSchema(`{
+  value?: number;
+}`);
+```
+</td>
+<td>
+
+```tsx
+{ value: number | null }
+```
+</td>
+</tr>
+
+<tr>
+<td>
+
+```tsx
+// Optional 'value' field with default value
+const schema = compileSchema(`{
+  value?: number = 1;
+}`);
+```
+</td>
+<td>
+
+```tsx
+{ value: number }
+```
+</td>
+</tr>
+
+<tr>
+<td>
+
+```tsx
+// Apply min rule to 'value' field
+const schema = compileSchema(`{
+  value: number <min(1)>;
+}`);
+```
+</td>
+<td>
+
+```tsx
+{ value: number }
 ```
 </td>
 </tr>
@@ -155,26 +255,8 @@ const schema = compileSchema(`{
  - `int` the value must be an integer.
  - `positive` equivalent to `min(0)`.
 
-A default value can be provided:
-
-```tsx
-const schema = compileSchema(`{
-  delayMs: number <positive> = 0;
-}`);
-```
-
 
 #### Boolean
-
- ```tsx
-const schema = compileSchema(`{
-  include: boolean;
-}`);
-```
-
-Booleans do not support any rules.
-
-A default value of either `true` or `false` can be provided:
 
 <table>
 <tr>
@@ -197,7 +279,45 @@ const schema = compileSchema(`{
 ```
 </td>
 </tr>
+
+<tr>
+<td>
+
+```tsx
+// Optional 'include' field
+const schema = compileSchema(`{
+  include?: boolean;
+}`);
+```
+</td>
+<td>
+
+```tsx
+{ include: boolean | null }
+```
+</td>
+</tr>
+
+<tr>
+<td>
+
+```tsx
+// Optional 'include' field with default value
+const schema = compileSchema(`{
+  include?: boolean = false;
+}`);
+```
+</td>
+<td>
+
+```tsx
+{ include: boolean }
+```
+</td>
+</tr>
 </table>
+
+Booleans do not support any rules.
 
 
 ### Objects
@@ -414,6 +534,14 @@ const schema = compileSchema(`{
 
 Primitive types support rules to perform basic validation. Rules are specified inside of `<>` after the type name and before `;` with multiple rules separated by `,`. If the rule takes an argument, provide it inside of `()` after the rule name.
 
+<table>
+<tr>
+<th>Schema</th>
+<th>TypeScript type</th>
+</tr>
+<tr>
+<td>
+
 ```tsx
 const schema = compileSchema(`{
   age: number <positive, int>;
@@ -421,6 +549,19 @@ const schema = compileSchema(`{
   password: string <min(8)>;
 }`);
 ```
+</td>
+<td>
+
+```tsx
+{
+  age: number;
+  email: string;
+  password: string;
+}
+```
+</td>
+</tr>
+</table>
 
 The available rules can be found here:
 
@@ -428,7 +569,15 @@ The available rules can be found here:
 - [Number rules](#Number_rules)
 - Booleans do not support rules
 
-Rules may also be applied to arrays (and multidimensional arrays). In those cases, specify the rules after all `[]`
+Rules may also be applied to arrays (and multidimensional arrays). In those cases, specify the rules after the `[]` array notation.
+
+<table>
+<tr>
+<th>Schema</th>
+<th>TypeScript type</th>
+</tr>
+<tr>
+<td>
 
 ```tsx
 const schema = compileSchema(`{
@@ -436,6 +585,18 @@ const schema = compileSchema(`{
   coords: number[][] <int>;
 }`);
 ```
+</td>
+<td>
+
+```tsx
+{
+  tags: string[];
+  coords: number[][];
+}
+```
+</td>
+</tr>
+</table>
 
 Rules can not be applied directly to arrays or objects.
 
