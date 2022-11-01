@@ -56,6 +56,10 @@ const body = schema.parseSync(req.body);
   - [Records](#Records)
 - [Rules](#Rules)
 - [Optional fields](#Optional_fields)
+  - [Optional primitives](#Optional_primitives)
+  - [Optional arrays](#Optional_arrays)
+  - [Optional objects](#Optional_objects)
+  - [Optional records](#Optional_primitives)
 
 
 ## Field types
@@ -102,7 +106,7 @@ const schema = compileSchema(`{
 </tr>
 </table>
 
-##### String rules
+<h5 id="String_rules">String rules</h5>
 
  - `min(n)` sets a minimum length for the string.
  - `max(n)` sets a maximum length for the string.
@@ -144,7 +148,7 @@ const schema = compileSchema(`{
 </tr>
 </table>
 
-##### Number rules
+<h5 id="Number_rules">Number rules</h5>
 
  - `min(n)` sets a minimum value for the number.
  - `max(n)` sets a maximum value for the number.
@@ -226,7 +230,7 @@ const schema = compileSchema(`{
 Rules can not be applied directly to arrays or objects.
 
 
-## Optional fields
+<h2 id="Optional_fields">Optional fields</h2>
 
 By default, all fields are required. To mark a field as optional, add a `?` after the field name:
 
@@ -254,7 +258,9 @@ const schema = compileSchema(`{
 </table>
 
 
-### Optional primitive fields
+<h3 id="Optional_primitives">
+Optional primitives
+</h3>
 
 When a primitive field is optional, `null` and `undefined` values are not rejected.
 
@@ -270,7 +276,9 @@ console.log(output);
 ```
 
 
-### Optional array fields
+<h3 id="Optional_arrays">
+Optional arrays
+</h3>
 
 Optional arrays behave in the same way as primitives.
 
@@ -286,7 +294,9 @@ console.log(output);
 ```
 
 
-### Optional object fields
+<h3 id="Optional_objects">
+Optional objects
+</h3>
 
 Object fields behave the same as primitives and arrays, with the exception that object fields with no required fields accept `null` and `undefined`.
 
@@ -315,7 +325,9 @@ console.log(output.options);
 ```
 
 
-### Optional record fields
+<h3 id="Optional_records">
+Optional records
+</h3>
 
 Records fields are always optional. Using the `?:` optional notation throws an error.
 
