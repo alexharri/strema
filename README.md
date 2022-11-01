@@ -200,6 +200,216 @@ const schema = compileSchema(`{
 </table>
 
 
+### Object
+
+Objects fields represent a collection of sub-fields (key-value pairs).
+
+<table>
+<tr>
+<th>Schema</th>
+<th>TypeScript type</th>
+</tr>
+<tr>
+<td>
+
+```tsx
+const schema = compileSchema(`{
+  book: {
+    name: string;
+    description: string;
+    author: {
+      name: string;
+      age: number;
+    };
+  };
+}`);
+```
+</td>
+<td>
+
+```tsx
+{
+  book: {
+    name: string;
+    description: string;
+    author: {
+      name: string;
+      age: number;
+    };
+  };
+}
+```
+</td>
+</tr>
+</table>
+
+To create an object with dynamic keys, use a <a href="#Records">Record</a>.
+
+
+### Arrays
+
+Arrays represent a list of values. The list may be multidimensional.
+
+<table>
+<tr>
+<th>Schema</th>
+<th>TypeScript type</th>
+</tr>
+<tr>
+<td>
+
+```tsx
+const schema = compileSchema(`{
+  tags: string[];
+}`);
+```
+</td>
+<td>
+
+```tsx
+{ tags: string[] }
+```
+</td>
+</tr>
+
+<tr>
+<td>
+
+```tsx
+const schema = compileSchema(`{
+  matrix: number[][];
+}`);
+```
+</td>
+<td>
+
+```tsx
+{ matrix: number[][] }
+```
+</td>
+</tr>
+
+<tr>
+<td>
+
+```tsx
+const schema = compileSchema(`{
+  items: { name: string }[];
+}`);
+```
+</td>
+<td>
+
+```tsx
+{ items: Array<{ name: string }> }
+```
+</td>
+</tr>
+
+</table>
+
+You can create arrays of any type. Here's how you would represent an array of objects.
+
+<table>
+<tr>
+<th>Schema</th>
+<th>TypeScript type</th>
+</tr>
+<tr>
+<td>
+
+```tsx
+const schema = compileSchema(`{
+  books: {
+    name: string;
+    description: string;
+  }[];
+}`);
+```
+</td>
+<td>
+
+```tsx
+{
+  books: Array<{
+    name: string;
+    description: string;
+  }>;
+}
+```
+</td>
+</tr>
+</table>
+
+
+### Records
+
+Records represent a collection key-value pairs with dynamic keys (i.e. hash maps, dictionaries, associative arrays). The record syntax is `Record<K, V>` where `K` is the key type and `V` is the value type.
+
+`K` must be either `string` or `number`. `V` can be any value that this library supports.
+
+
+<table>
+<tr>
+<th>Schema</th>
+<th>TypeScript type</th>
+</tr>
+<tr>
+<td>
+
+```tsx
+const schema = compileSchema(`{
+  map: Record<string, number>;
+}`);
+```
+</td>
+<td>
+
+```tsx
+{ map: Record<string, number> }
+```
+</td>
+</tr>
+
+<tr>
+<td>
+
+```tsx
+const schema = compileSchema(`{
+  map: Record<string, {
+    value: number;
+  }>;
+}`);
+```
+</td>
+<td>
+
+```tsx
+{ map: Record<string, { value: number }> }
+```
+</td>
+</tr>
+
+<tr>
+<td>
+
+```tsx
+const schema = compileSchema(`{
+  map: Record<string, number[]>;
+}`);
+```
+</td>
+<td>
+
+```tsx
+{ map: Record<string, number[]> }
+```
+</td>
+</tr>
+</table>
+
+
+
 ## Rules
 
 Primitive types support rules to perform basic validation. Rules are specified inside of `<>` after the type name and before `;` with multiple rules separated by `,`. If the rule takes an argument, provide it inside of `()` after the rule name.
