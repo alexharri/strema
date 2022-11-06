@@ -3,7 +3,7 @@
 </h1>
 
 <p align="center">
-  Experimental schema builder using TypeScript templates.
+  Experimental schema builder using TypeScript template strings.
 </p>
 
 
