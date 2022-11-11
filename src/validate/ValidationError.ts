@@ -29,7 +29,7 @@ export class ValidationError extends Error {
     return new ValidationError({ message: "", value: null, ctx: { path: [] } });
   }
 
-  setPath(path: string[]) {
+  setPath = (path: string[]) => {
     this.path = stringifyPropertyPath(path);
     this.pathParts = path;
     return this;
