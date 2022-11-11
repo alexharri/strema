@@ -479,7 +479,7 @@ var delimeters = new Set([
 ]);
 var whitespace = new Set([" ", "\t", "\n"]);
 function isAlpha(c) {
-    return /^[a-zA-Z]$/.test(c);
+    return /^[a-zA-Z_]$/.test(c);
 }
 function isNumeric(c) {
     return /^[0-9]$/.test(c);
