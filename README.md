@@ -8,7 +8,7 @@
 
 ## Concept
 
-The concept of how this library works is explained in the blog post [Build your own schema language with TypeScript's infer keyword](https://alexharri.com/blog/build-schema-language-with-infer)
+The inner workings of this library are explained in this blog post: [Build your own schema language with TypeScript's infer keyword](https://alexharri.com/blog/build-schema-language-with-infer).
 
 ## Usage
 
